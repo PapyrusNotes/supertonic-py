@@ -11,11 +11,89 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# Model configuration
-DEFAULT_MODEL_REPO = os.getenv("SUPERTONIC_MODEL_REPO", "Supertone/supertonic")
-DEFAULT_CACHE_DIR = os.getenv("SUPERTONIC_CACHE_DIR", str(Path.home() / ".cache" / "supertonic"))
-# FIXME: change to the latest tag
-DEFAULT_MODEL_REVISION = os.getenv("SUPERTONIC_MODEL_REVISION", "v1.0.0")
+# Available models
+AVAILABLE_MODELS = ["supertonic", "supertonic-2"]
+DEFAULT_MODEL = "supertonic-2"
+
+# Model configuration mapping
+MODEL_CONFIGS = {
+    "supertonic": {
+        "repo": "Supertone/supertonic",
+        "cache_dir": "supertonic",
+        "multilingual": False,
+    },
+    "supertonic-2": {
+        "repo": "Supertone/supertonic-2",
+        "cache_dir": "supertonic2",
+        "multilingual": True,
+    },
+}
+
+# Default model settings (can be overridden by environment variables)
+DEFAULT_MODEL_REPO = os.getenv("SUPERTONIC_MODEL_REPO", MODEL_CONFIGS[DEFAULT_MODEL]["repo"])
+DEFAULT_CACHE_DIR = os.getenv(
+    "SUPERTONIC_CACHE_DIR", str(Path.home() / ".cache" / MODEL_CONFIGS[DEFAULT_MODEL]["cache_dir"])
+)
+DEFAULT_MODEL_REVISION = os.getenv("SUPERTONIC_MODEL_REVISION", "main")
+
+
+def get_model_config(model_name: str) -> dict:
+    """Get configuration for a specific model.
+
+    Args:
+        model_name: Model name ("supertonic" or "supertonic-2")
+
+    Returns:
+        Dictionary with model configuration (repo, cache_dir, multilingual)
+
+    Raises:
+        ValueError: If model_name is not valid
+    """
+    if model_name not in MODEL_CONFIGS:
+        raise ValueError(
+            f"Invalid model: '{model_name}'. " f"Available models: {', '.join(AVAILABLE_MODELS)}"
+        )
+    return MODEL_CONFIGS[model_name]
+
+
+def get_model_cache_dir(model_name: str) -> Path:
+    """Get cache directory for a specific model.
+
+    Args:
+        model_name: Model name ("supertonic" or "supertonic-2")
+
+    Returns:
+        Path to the model's cache directory
+    """
+    config = get_model_config(model_name)
+    return Path.home() / ".cache" / config["cache_dir"]
+
+
+def get_model_repo(model_name: str) -> str:
+    """Get HuggingFace repo ID for a specific model.
+
+    Args:
+        model_name: Model name ("supertonic" or "supertonic-2")
+
+    Returns:
+        HuggingFace repository ID
+    """
+    config = get_model_config(model_name)
+    return config["repo"]
+
+
+def is_multilingual_model(model_name: str) -> bool:
+    """Check if a model supports multilingual synthesis.
+
+    Args:
+        model_name: Model name ("supertonic" or "supertonic-2")
+
+    Returns:
+        True if model supports multiple languages
+    """
+    config = get_model_config(model_name)
+    return config["multilingual"]
+
 
 # Model paths
 ONNX_DIR = Path("onnx")
@@ -28,10 +106,15 @@ TEXT_ENC_ONNX_REL_PATH = ONNX_DIR / "text_encoder.onnx"
 VECTOR_EST_ONNX_REL_PATH = ONNX_DIR / "vector_estimator.onnx"
 VOCODER_ONNX_REL_PATH = ONNX_DIR / "vocoder.onnx"
 
+# Language configuration (supertonic-2 multilingual support)
+AVAILABLE_LANGUAGES = ["en", "ko", "es", "pt", "fr"]
+DEFAULT_LANGUAGE = "en"
+
 # TTS parameters - defaults
 DEFAULT_TOTAL_STEPS = 5
 DEFAULT_SPEED = 1.05
 DEFAULT_MAX_CHUNK_LENGTH = 300
+DEFAULT_MAX_CHUNK_LENGTH_KO = 120  # Korean requires shorter chunks
 DEFAULT_SILENCE_DURATION = 0.3  # seconds
 
 # TTS parameters - constraints

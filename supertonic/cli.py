@@ -12,6 +12,7 @@ import sys
 import time
 
 from . import __version__
+from .config import AVAILABLE_MODELS, DEFAULT_MODEL
 from .pipeline import TTS
 
 logger = logging.getLogger(__name__)
@@ -39,9 +40,9 @@ def cmd_say(args):
 
     try:
         # Initialize TTS
-        print("Loading model...")
+        print(f"Loading model ({args.model})...")
         load_start = time.time()
-        tts = TTS()
+        tts = TTS(model=args.model)
         load_time = time.time() - load_start
         print(f"   -> Model loaded in {load_time:.2f}s")
 
@@ -77,7 +78,7 @@ def cmd_say(args):
         print(f"   -> Voice style loaded in {style_time:.3f}s")
 
         # Generate speech
-        print("Generating speech...")
+        print(f"Generating speech (lang={args.lang})...")
         start_time = time.time()
         wav, duration = tts.synthesize(
             args.text,
@@ -86,6 +87,7 @@ def cmd_say(args):
             speed=args.speed,
             max_chunk_length=args.max_chunk_length,
             silence_duration=args.silence_duration,
+            lang=args.lang,
             verbose=args.verbose,
         )
         elapsed_time = time.time() - start_time
@@ -117,9 +119,9 @@ def cmd_tts(args):
 
     try:
         # Initialize TTS
-        print("Loading model...")
+        print(f"Loading model ({args.model})...")
         load_start = time.time()
-        tts = TTS()
+        tts = TTS(model=args.model)
         load_time = time.time() - load_start
         print(f"   -> Model loaded in {load_time:.2f}s")
 
@@ -155,7 +157,7 @@ def cmd_tts(args):
         print(f"   -> Voice style loaded in {style_time:.3f}s")
 
         # Generate speech
-        print("Generating speech...")
+        print(f"Generating speech (lang={args.lang})...")
         start_time = time.time()
         wav, duration = tts.synthesize(
             args.text,
@@ -164,6 +166,7 @@ def cmd_tts(args):
             speed=args.speed,
             max_chunk_length=args.max_chunk_length,
             silence_duration=args.silence_duration,
+            lang=args.lang,
             verbose=args.verbose,
         )
         elapsed_time = time.time() - start_time
@@ -254,6 +257,11 @@ Examples:
   supertonic say 'This is a female voice style.' --voice F1 --steps 10
   supertonic tts 'This is a female voice style.' -o hello.wav --voice F1 --steps 10
 
+  # Multilingual support (Korean, Spanish, Portuguese, French)
+  supertonic say '안녕하세요! 반갑습니다.' --lang ko
+  supertonic tts 'Bonjour le monde!' -o french.wav --lang fr
+  supertonic tts 'Hola, bienvenido!' -o spanish.wav --lang es
+
   # Use custom voice style from JSON file
   supertonic say 'This is a custom voice test.' --custom-style-path ./my_voice.json
 
@@ -281,12 +289,26 @@ Examples:
         "say", help="Generate speech and play it directly without saving a file"
     )
     parser_say.add_argument("text", help="Text to synthesize and play")
+    parser_say.add_argument(
+        "--model",
+        type=str,
+        default=DEFAULT_MODEL,
+        choices=AVAILABLE_MODELS,
+        help=f"Model to use: supertonic (English only) or supertonic-2 (multilingual). Default: {DEFAULT_MODEL}",
+    )
     parser_say.add_argument("--voice", default="M1", help="Voice style (default: M1)")
     parser_say.add_argument(
         "--custom-style-path",
         type=str,
         default=None,
         help="Path to custom voice style JSON file (overrides --voice if provided)",
+    )
+    parser_say.add_argument(
+        "--lang",
+        type=str,
+        default="en",
+        choices=["en", "ko", "es", "pt", "fr"],
+        help="Language code: en (English), ko (Korean), es (Spanish), pt (Portuguese), fr (French). Default: en",
     )
     parser_say.add_argument(
         "--steps", type=int, default=5, help="Quality steps (default: 5, higher=better)"
@@ -300,8 +322,8 @@ Examples:
     parser_say.add_argument(
         "--max-chunk-length",
         type=int,
-        default=300,
-        help="Maximum characters per chunk (default: 300)",
+        default=None,
+        help="Maximum characters per chunk (default: auto based on language)",
     )
     parser_say.add_argument(
         "--silence-duration",
@@ -316,12 +338,26 @@ Examples:
     parser_tts = subparsers.add_parser("tts", aliases=["t"], help="Generate speech from text")
     parser_tts.add_argument("text", help="Text to synthesize")
     parser_tts.add_argument("-o", "--output", required=True, help="Output WAV file")
+    parser_tts.add_argument(
+        "--model",
+        type=str,
+        default=DEFAULT_MODEL,
+        choices=AVAILABLE_MODELS,
+        help=f"Model to use: supertonic (English only) or supertonic-2 (multilingual). Default: {DEFAULT_MODEL}",
+    )
     parser_tts.add_argument("--voice", default="M1", help="Voice style (default: M1)")
     parser_tts.add_argument(
         "--custom-style-path",
         type=str,
         default=None,
         help="Path to custom voice style JSON file (overrides --voice if provided)",
+    )
+    parser_tts.add_argument(
+        "--lang",
+        type=str,
+        default="en",
+        choices=["en", "ko", "es", "pt", "fr"],
+        help="Language code: en (English), ko (Korean), es (Spanish), pt (Portuguese), fr (French). Default: en",
     )
     parser_tts.add_argument(
         "--steps", type=int, default=5, help="Quality steps (default: 5, higher=better)"
@@ -335,8 +371,8 @@ Examples:
     parser_tts.add_argument(
         "--max-chunk-length",
         type=int,
-        default=300,
-        help="Maximum characters per chunk (default: 300)",
+        default=None,
+        help="Maximum characters per chunk (default: auto based on language)",
     )
     parser_tts.add_argument(
         "--silence-duration",

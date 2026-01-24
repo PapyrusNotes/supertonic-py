@@ -1,15 +1,17 @@
 # Supertonic — Lightning Fast, On-Device TTS
 
 <p align="center">
-  <img src="https://github.com/supertone-inc/supertonic-py/blob/main/assets/images/Supertonic_IMG_v02_4x.webp?raw=true" alt="Supertonic Banner">
+  <img src="docs/assets/images/Supertonic_IMG_v02_4x.webp" alt="Supertonic Banner">
 </p>
 
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic-black?logo=github)](https://github.com/supertone-inc/supertonic)
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic--py-black?logo=github)](https://github.com/supertone-inc/supertonic-py)
 [![Demo](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo-yellow)](https://huggingface.co/spaces/Supertone/supertonic)
-[![Models](https://img.shields.io/badge/🤗%20Hugging%20Face-Models-blue)](https://huggingface.co/Supertone/supertonic)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/supertone-inc/supertonic-py/blob/main/notebook/supertonic_demo.ipynb)
-[![Docs](https://img.shields.io/badge/Docs-supertonic--py-orange?logo=readthedocs&logoColor=white)](https://supertone-inc.github.io/supertonic-py)
+[![Models](https://img.shields.io/badge/🤗%20Hugging%20Face-Models-blue)](https://huggingface.co/Supertone/supertonic-2)
+[![PyPI version](https://badge.fury.io/py/supertonic.svg)](https://badge.fury.io/py/supertonic)
+
+> 🆕 **Supertonic-2**: Now with multilingual support! 5 languages available: English, Korean, Spanish, Portuguese, and French.
+
 
 ## Quick Start
 
@@ -20,8 +22,14 @@ pip install supertonic
 ### CLI
 
 ```bash
-# Note: First run will download the model (~260MB) from HuggingFace
+# Note: First run will download the model (~305MB) from HuggingFace
 supertonic tts 'Supertonic is a lightning fast, on-device TTS system.' -o output.wav
+
+# Multilingual support - each language with natural text handling
+supertonic tts '회의는 2024년 4월 3일 수요일 오후 4시 45분에 시작됩니다.' -o korean.wav --lang ko
+supertonic tts 'La reunión satisfactoria se programó para las 4:45 PM del miércoles.' -o spanish.wav --lang es
+supertonic tts 'A reunião foi agendada para as 16h45 de quarta-feira, 3 de abril.' -o portuguese.wav --lang pt
+supertonic tts 'La réunion est prévue pour 16h45 le mercredi 3 avril 2024.' -o french.wav --lang fr
 ```
 
 ### Python
@@ -29,15 +37,21 @@ supertonic tts 'Supertonic is a lightning fast, on-device TTS system.' -o output
 ```python
 from supertonic import TTS
 
-# Note: First run downloads model automatically (~260MB)
+# Note: First run downloads model automatically (~305MB)
 tts = TTS(auto_download=True)
 
 # Get a voice style
 style = tts.get_voice_style(voice_name="M1")
 
-# Generate speech
+# Generate speech (English - default)
 text = "The train delay was announced at 4:45 PM on Wed, Apr 3, 2024 due to track maintenance."
-wav, duration = tts.synthesize(text, voice_style=style)
+wav, duration = tts.synthesize(text, voice_style=style, lang="en")
+
+# Multilingual synthesis - each language with natural text handling
+wav_ko, _ = tts.synthesize("회의는 2024년 4월 3일 수요일 오후 4시 45분에 시작됩니다.", voice_style=style, lang="ko")
+wav_es, _ = tts.synthesize("La reunión satisfactoria se programó para las 4:45 PM del miércoles.", voice_style=style, lang="es")
+wav_pt, _ = tts.synthesize("A reunião foi agendada para as 16h45 de quarta-feira, 3 de abril.", voice_style=style, lang="pt")
+wav_fr, _ = tts.synthesize("La réunion est prévue pour 16h45 le mercredi 3 avril 2024.", voice_style=style, lang="fr")
 
 # Save to file
 tts.save_audio(wav, "output.wav")
@@ -61,11 +75,23 @@ Supertonic has **minimal dependencies** - just 4 core libraries:
 
 **📱 On-Device Capable**: **Complete privacy** and **zero latency**
 
+**🌐 Multilingual (v2)**: Supports **5 languages** — English, Korean, Spanish, Portuguese, and French
+
 **🎨 Natural Text Handling**: Seamlessly processes complex expressions without G2P module
 
 **⚙️ Highly Configurable**: Adjust inference steps, batch processing, and other parameters
 
 **🧩 Flexible Deployment**: Deploy across servers, browsers, and edge devices
+
+## Supported Languages
+
+| Language | Code | Example |
+|----------|------|---------|
+| English | `en` | "The train delay was announced at 4:45 PM on Wed, Apr 3, 2024." |
+| Korean | `ko` | "회의는 2024년 4월 3일 수요일 오후 4시 45분에 시작됩니다." |
+| Spanish | `es` | "La reunión satisfactoria se programó para las 4:45 PM del miércoles." |
+| Portuguese | `pt` | "A reunião foi agendada para as 16h45 de quarta-feira, 3 de abril." |
+| French | `fr` | "La réunion est prévue pour 16h45 le mercredi 3 avril 2024." |
 
 
 
@@ -308,13 +334,13 @@ This paper describes the self-purification technique for training flow matching 
 
 **🎧 Try it live**: [Hugging Face Spaces](https://huggingface.co/spaces/Supertone/supertonic)
 
-**🤗 Model Repository**: [Hugging Face Models](https://huggingface.co/Supertone/supertonic)
+**🤗 Model Repository**: [Hugging Face Models (Supertonic-2)](https://huggingface.co/Supertone/supertonic-2)
 
 ## License
 
 **Code**: [MIT License](LICENSE)
 
-**Model**: [OpenRAIL-M License](https://huggingface.co/Supertone/supertonic/blob/main/LICENSE)
+**Model**: [OpenRAIL-M License](https://huggingface.co/Supertone/supertonic-2/blob/main/LICENSE)
 
 
 Copyright © 2025 Supertone Inc.
