@@ -36,7 +36,7 @@ from .config import AVAILABLE_LANGUAGES, AVAILABLE_MODELS, DEFAULT_LANGUAGE, DEF
 from .core import Style, UnicodeProcessor
 from .pipeline import TTS
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 __all__ = [
     "TTS",

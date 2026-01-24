@@ -1,7 +1,7 @@
 # Supertonic — Lightning Fast, On-Device TTS
 
 <p align="center">
-  <img src="assets/images/supertonic_preview_0.1.jpg" alt="Supertonic 2 Banner">
+  <img src="https://raw.githubusercontent.com/supertone-inc/supertonic-py/main/assets/images/supertonic_preview_0.1.jpg" alt="Supertonic 2 Banner">
 </p>
 
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic-black?logo=github)](https://github.com/supertone-inc/supertonic)
