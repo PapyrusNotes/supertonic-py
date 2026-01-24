@@ -8,7 +8,7 @@ version = "1.1.2"
 description = "High-quality Text-to-Speech synthesis with ONNX Runtime"
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Kim, Hyeongju", email = "hyeongju@supertone.ai"},
     {name = "Yu, Yechan", email = "ato@supertone.ai"},
@@ -32,7 +32,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",

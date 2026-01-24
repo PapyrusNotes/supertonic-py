@@ -6,11 +6,12 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic-black?logo=github)](https://github.com/supertone-inc/supertonic)
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic--py-black?logo=github)](https://github.com/supertone-inc/supertonic-py)
+[![Documentation](https://img.shields.io/badge/Documentation-blue?logo=readthedocs&logoColor=white)](https://supertone-inc.github.io/supertonic-py/)
 [![Demo](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo-yellow)](https://huggingface.co/spaces/Supertone/supertonic-2)
 [![Models](https://img.shields.io/badge/🤗%20Hugging%20Face-Models-blue)](https://huggingface.co/Supertone/supertonic-2)
 [![PyPI version](https://badge.fury.io/py/supertonic.svg)](https://badge.fury.io/py/supertonic)
 
-> 🆕 **Supertonic-2**: Now with multilingual support! 5 languages available: English, Korean, Spanish, Portuguese, and French.
+> **Supertonic-2**: Now with multilingual support! 5 languages available: English, Korean, Spanish, Portuguese, and French.
 
 
 ## Quick Start
