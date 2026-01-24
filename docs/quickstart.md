@@ -17,15 +17,15 @@ pip install supertonic
     ```python
     from supertonic import TTS
 
-    # Note: First run downloads model automatically (~260MB)
+    # Note: First run downloads model automatically (~305MB)
     tts = TTS(auto_download=True)
 
     # Get a voice style
     style = tts.get_voice_style(voice_name="F3")
 
-    # Generate speech
+    # Generate speech (English - default)
     text = "The train delay was announced at 4:45 PM on Wed, Apr 3, 2024 due to track maintenance."
-    wav, duration = tts.synthesize(text, voice_style=style)
+    wav, duration = tts.synthesize(text, voice_style=style, lang="en")
     # wav: np.ndarray, shape = (1, num_samples)
     # duration: np.ndarray, shape = (1,)
 
@@ -38,6 +38,7 @@ pip install supertonic
         |-----------|-------------|---------|
         | `text` | Text to synthesize | *required* |
         | `voice_style` | Voice style object | *required* |
+        | `lang` | Language code: `en`, `ko`, `es`, `pt`, `fr` | `en` |
         | `total_steps` | Quality: 2-15 typical (higher=better) | `5` |
         | `speed` | Speed: 0.7 (slow) to 2.0 (fast) | `1.05` |
         | `max_chunk_length` | Max characters per chunk | `300` |
@@ -53,8 +54,11 @@ pip install supertonic
 === "CLI"
 
     ```bash
-    # Note: First run downloads model automatically (~260MB)
+    # Note: First run downloads model automatically (~305MB)
     supertonic tts 'Supertonic is a lightning fast, on-device TTS system.' -o output.wav
+
+    # Multilingual support
+    supertonic tts '회의는 2024년 4월 3일 수요일 오후 4시 45분에 시작됩니다.' -o korean.wav --lang ko
     ```
 
     ??? tip "CLI Options"
@@ -62,6 +66,7 @@ pip install supertonic
         |--------|-------------|---------|
         | `-o`, `--output` | Output file path | *required* |
         | `--voice` | Voice style: M1, F1, M2, F2, ... | `M1` |
+        | `--lang` | Language: `en`, `ko`, `es`, `pt`, `fr` | `en` |
         | `--steps` | Quality steps: 2-15 typical | `5` |
         | `--speed` | Speed multiplier: 0.7-2.0 | `1.05` |
         | `--max-chunk-length` | Characters per chunk | `300` |
@@ -87,6 +92,65 @@ Run and experiment with Supertonic in Google Colab:
 ---
 
 ## Advanced Usage
+
+### Multilingual Support
+
+Supertonic-2 supports 5 languages with natural text handling:
+
+| Language | Code | Example |
+|----------|------|---------|
+| English | `en` | "The train delay was announced at 4:45 PM." |
+| Korean | `ko` | "회의는 2024년 4월 3일 수요일 오후 4시 45분에 시작됩니다." |
+| Spanish | `es` | "La reunión se programó para las 4:45 PM del miércoles." |
+| Portuguese | `pt` | "A reunião foi agendada para as 16h45 de quarta-feira." |
+| French | `fr` | "La réunion est prévue pour 16h45 le mercredi 3 avril." |
+
+=== "Python"
+
+    ```python
+    from supertonic import TTS
+
+    tts = TTS()
+    style = tts.get_voice_style("M1")
+
+    # English (default)
+    wav_en, _ = tts.synthesize("Hello, welcome to Supertonic!", voice_style=style, lang="en")
+
+    # Korean
+    wav_ko, _ = tts.synthesize("안녕하세요! 수퍼토닉에 오신 것을 환영합니다.", voice_style=style, lang="ko")
+
+    # Spanish
+    wav_es, _ = tts.synthesize("¡Hola! Bienvenido a Supertonic.", voice_style=style, lang="es")
+
+    # Portuguese
+    wav_pt, _ = tts.synthesize("Olá! Bem-vindo ao Supertonic.", voice_style=style, lang="pt")
+
+    # French
+    wav_fr, _ = tts.synthesize("Bonjour! Bienvenue sur Supertonic.", voice_style=style, lang="fr")
+
+    tts.save_audio(wav_ko, "output_korean.wav")
+    ```
+
+=== "CLI"
+
+    ```bash
+    # English (default)
+    supertonic tts 'Hello, welcome to Supertonic!' -o output_en.wav
+
+    # Korean
+    supertonic tts '안녕하세요! 수퍼토닉에 오신 것을 환영합니다.' --lang ko -o output_ko.wav
+
+    # Spanish
+    supertonic tts '¡Hola! Bienvenido a Supertonic.' --lang es -o output_es.wav
+
+    # Portuguese
+    supertonic tts 'Olá! Bem-vindo ao Supertonic.' --lang pt -o output_pt.wav
+
+    # French
+    supertonic tts 'Bonjour! Bienvenue sur Supertonic.' --lang fr -o output_fr.wav
+    ```
+
+---
 
 ### Voice Styles
 
