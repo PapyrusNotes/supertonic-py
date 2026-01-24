@@ -2,6 +2,14 @@
 
 Text to synthesize and play
 
+#### `--model`
+
+Possible choices: `supertonic`, `supertonic-2`
+
+Model to use: supertonic (English only) or supertonic-2 (multilingual). Default: supertonic-2
+
+Default: `supertonic-2`
+
 #### `--voice`
 
 Voice style (default: M1)
@@ -11,6 +19,14 @@ Default: `M1`
 #### `--custom-style-path`
 
 Path to custom voice style JSON file (overrides --voice if provided)
+
+#### `--lang`
+
+Possible choices: `en`, `ko`, `es`, `pt`, `fr`
+
+Language code: en (English), ko (Korean), es (Spanish), pt (Portuguese), fr (French). Default: en
+
+Default: `en`
 
 #### `--steps`
 
@@ -26,9 +42,7 @@ Default: `1.05`
 
 #### `--max-chunk-length`
 
-Maximum characters per chunk (default: 300)
-
-Default: `300`
+Maximum characters per chunk (default: auto based on language)
 
 #### `--silence-duration`
 
@@ -41,3 +55,4 @@ Default: `0.3`
 Enable verbose output with detailed logging
 
 Default: `False`
+

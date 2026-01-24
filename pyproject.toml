@@ -65,7 +65,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/supertone-inc/supertonic-py"
+Homepage = "https://github.com/supertone-inc/supertonic"
 Repository = "https://github.com/supertone-inc/supertonic-py"
 Documentation = "https://supertone-inc.github.io/supertonic-py"
 Issues = "https://github.com/supertone-inc/supertonic-py/issues"
