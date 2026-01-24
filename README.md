@@ -1,12 +1,12 @@
 # Supertonic — Lightning Fast, On-Device TTS
 
 <p align="center">
-  <img src="docs/assets/images/Supertonic_IMG_v02_4x.webp" alt="Supertonic Banner">
+  <img src="assets/images/supertonic_preview_0.1.jpg" alt="Supertonic 2 Banner">
 </p>
 
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic-black?logo=github)](https://github.com/supertone-inc/supertonic)
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic--py-black?logo=github)](https://github.com/supertone-inc/supertonic-py)
-[![Demo](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo-yellow)](https://huggingface.co/spaces/Supertone/supertonic)
+[![Demo](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo-yellow)](https://huggingface.co/spaces/Supertone/supertonic-2)
 [![Models](https://img.shields.io/badge/🤗%20Hugging%20Face-Models-blue)](https://huggingface.co/Supertone/supertonic-2)
 [![PyPI version](https://badge.fury.io/py/supertonic.svg)](https://badge.fury.io/py/supertonic)
 
@@ -165,7 +165,7 @@ We evaluated Supertonic's performance (with 2 inference steps) using two key met
 
 Supertonic is designed to handle complex, real-world text inputs that contain numbers, currency symbols, abbreviations, dates, and proper nouns.
 
-> 🎧 **View audio samples more easily**: Check out our [**Interactive Demo**](https://huggingface.co/spaces/Supertone/supertonic#text-handling) for a better viewing experience of all audio examples
+> 🎧 **View audio samples more easily**: Check out our [**Interactive Demo**](https://huggingface.co/spaces/Supertone/supertonic-2#text-handling) for a better viewing experience of all audio examples
 
 **Overview of Test Cases:**
 
@@ -332,7 +332,7 @@ This paper describes the self-purification technique for training flow matching 
 
 **🏠 Main Repository**: [github.com/supertone-inc/supertonic](https://github.com/supertone-inc/supertonic)
 
-**🎧 Try it live**: [Hugging Face Spaces](https://huggingface.co/spaces/Supertone/supertonic)
+**🎧 Try it live**: [Hugging Face Spaces](https://huggingface.co/spaces/Supertone/supertonic-2)
 
 **🤗 Model Repository**: [Hugging Face Models (Supertonic-2)](https://huggingface.co/Supertone/supertonic-2)
 
