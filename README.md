@@ -27,10 +27,10 @@ pip install supertonic
 supertonic tts 'Supertonic is a lightning fast, on-device TTS system.' -o output.wav
 
 # Multilingual support - each language with natural text handling
-supertonic tts '회의는 2024년 4월 3일 수요일 오후 4시 45분에 시작됩니다.' -o korean.wav --lang ko
-supertonic tts 'La reunión satisfactoria se programó para las 4:45 PM del miércoles.' -o spanish.wav --lang es
-supertonic tts 'A reunião foi agendada para as 16h45 de quarta-feira, 3 de abril.' -o portuguese.wav --lang pt
-supertonic tts 'La réunion est prévue pour 16h45 le mercredi 3 avril 2024.' -o french.wav --lang fr
+supertonic tts '회의는 잠시 후에 시작되며 모두가 자리에 앉아 기다립니다.' -o korean.wav --lang ko
+supertonic tts 'La reunión comienza pronto y todos se sientan en silencio para escuchar.' -o spanish.wav --lang es
+supertonic tts 'A reunião começa em breve e todos se sentam em silêncio para ouvir.' -o portuguese.wav --lang pt
+supertonic tts 'La réunion commence bientôt et tout le monde s’assoit en silence pour écouter.' -o french.wav --lang fr
 ```
 
 ### Python
@@ -49,10 +49,10 @@ text = "The train delay was announced at 4:45 PM on Wed, Apr 3, 2024 due to trac
 wav, duration = tts.synthesize(text, voice_style=style, lang="en")
 
 # Multilingual synthesis - each language with natural text handling
-wav_ko, _ = tts.synthesize("회의는 2024년 4월 3일 수요일 오후 4시 45분에 시작됩니다.", voice_style=style, lang="ko")
-wav_es, _ = tts.synthesize("La reunión satisfactoria se programó para las 4:45 PM del miércoles.", voice_style=style, lang="es")
-wav_pt, _ = tts.synthesize("A reunião foi agendada para as 16h45 de quarta-feira, 3 de abril.", voice_style=style, lang="pt")
-wav_fr, _ = tts.synthesize("La réunion est prévue pour 16h45 le mercredi 3 avril 2024.", voice_style=style, lang="fr")
+wav_ko, _ = tts.synthesize("회의는 잠시 후에 시작되며 모두가 자리에 앉아 기다립니다.", voice_style=style, lang="ko")
+wav_es, _ = tts.synthesize("La reunión comienza pronto y todos se sientan en silencio para escuchar.", voice_style=style, lang="es")
+wav_pt, _ = tts.synthesize("A reunião começa em breve e todos se sentam em silêncio para ouvir.", voice_style=style, lang="pt")
+wav_fr, _ = tts.synthesize("La réunion commence bientôt et tout le monde s’assoit en silence pour écouter.", voice_style=style, lang="fr")
 
 # Save to file
 tts.save_audio(wav, "output.wav")
@@ -89,10 +89,10 @@ Supertonic has **minimal dependencies** - just 4 core libraries:
 | Language | Code | Example |
 |----------|------|---------|
 | English | `en` | "The train delay was announced at 4:45 PM on Wed, Apr 3, 2024." |
-| Korean | `ko` | "회의는 2024년 4월 3일 수요일 오후 4시 45분에 시작됩니다." |
-| Spanish | `es` | "La reunión satisfactoria se programó para las 4:45 PM del miércoles." |
-| Portuguese | `pt` | "A reunião foi agendada para as 16h45 de quarta-feira, 3 de abril." |
-| French | `fr` | "La réunion est prévue pour 16h45 le mercredi 3 avril 2024." |
+| Korean | `ko` | "회의는 잠시 후에 시작되며 모두가 자리에 앉아 기다립니다." |
+| Spanish | `es` | "La reunión comienza pronto y todos se sientan en silencio para escuchar." |
+| Portuguese | `pt` | "A reunião começa em breve e todos se sentam em silêncio para ouvir." |
+| French | `fr` | "La réunion commence bientôt et tout le monde s’assoit en silence pour écouter." |
 
 
 
