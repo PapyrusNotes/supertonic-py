@@ -12,7 +12,7 @@ import sys
 import time
 
 from . import __version__
-from .config import AVAILABLE_MODELS, DEFAULT_MODEL
+from .config import AVAILABLE_LANGUAGES, AVAILABLE_MODELS, DEFAULT_LANGUAGE, DEFAULT_MODEL
 from .pipeline import TTS
 
 logger = logging.getLogger(__name__)
@@ -257,10 +257,13 @@ Examples:
   supertonic say 'This is a female voice style.' --voice F1 --steps 10
   supertonic tts 'This is a female voice style.' -o hello.wav --voice F1 --steps 10
 
-  # Multilingual support (Korean, Spanish, Portuguese, French)
+  # Multilingual support (supertonic-3 covers 31 languages — see --lang choices)
   supertonic say '안녕하세요! 반갑습니다.' --lang ko
   supertonic tts 'Bonjour le monde!' -o french.wav --lang fr
   supertonic tts 'Hola, bienvenido!' -o spanish.wav --lang es
+
+  # Unknown / unsupported language fallback (supertonic-3)
+  supertonic say 'Some uncommon text' --lang na
 
   # Use custom voice style from JSON file
   supertonic say 'This is a custom voice test.' --custom-style-path ./my_voice.json
@@ -294,7 +297,10 @@ Examples:
         type=str,
         default=DEFAULT_MODEL,
         choices=AVAILABLE_MODELS,
-        help=f"Model to use: supertonic (English only) or supertonic-2 (multilingual). Default: {DEFAULT_MODEL}",
+        help=(
+            "Model to use: supertonic (English only), supertonic-2 (5 languages), "
+            f"or supertonic-3 (31 languages + 'na' fallback). Default: {DEFAULT_MODEL}"
+        ),
     )
     parser_say.add_argument("--voice", default="M1", help="Voice style (default: M1)")
     parser_say.add_argument(
@@ -306,9 +312,16 @@ Examples:
     parser_say.add_argument(
         "--lang",
         type=str,
-        default="en",
-        choices=["en", "ko", "es", "pt", "fr"],
-        help="Language code: en (English), ko (Korean), es (Spanish), pt (Portuguese), fr (French). Default: en",
+        default=DEFAULT_LANGUAGE,
+        choices=AVAILABLE_LANGUAGES,
+        metavar="LANG",
+        help=(
+            "Language code (supertonic-3): "
+            "en, ko, ja, ar, bg, cs, da, de, el, es, et, fi, fr, hi, hr, hu, "
+            "id, it, lt, lv, nl, pl, pt, ro, ru, sk, sl, sv, tr, uk, vi, "
+            "or 'na' for unknown / unsupported languages. "
+            f"Default: {DEFAULT_LANGUAGE}"
+        ),
     )
     parser_say.add_argument(
         "--steps", type=int, default=5, help="Quality steps (default: 5, higher=better)"
@@ -343,7 +356,10 @@ Examples:
         type=str,
         default=DEFAULT_MODEL,
         choices=AVAILABLE_MODELS,
-        help=f"Model to use: supertonic (English only) or supertonic-2 (multilingual). Default: {DEFAULT_MODEL}",
+        help=(
+            "Model to use: supertonic (English only), supertonic-2 (5 languages), "
+            f"or supertonic-3 (31 languages + 'na' fallback). Default: {DEFAULT_MODEL}"
+        ),
     )
     parser_tts.add_argument("--voice", default="M1", help="Voice style (default: M1)")
     parser_tts.add_argument(
@@ -355,9 +371,16 @@ Examples:
     parser_tts.add_argument(
         "--lang",
         type=str,
-        default="en",
-        choices=["en", "ko", "es", "pt", "fr"],
-        help="Language code: en (English), ko (Korean), es (Spanish), pt (Portuguese), fr (French). Default: en",
+        default=DEFAULT_LANGUAGE,
+        choices=AVAILABLE_LANGUAGES,
+        metavar="LANG",
+        help=(
+            "Language code (supertonic-3): "
+            "en, ko, ja, ar, bg, cs, da, de, el, es, et, fi, fr, hi, hr, hu, "
+            "id, it, lt, lv, nl, pl, pt, ro, ru, sk, sl, sv, tr, uk, vi, "
+            "or 'na' for unknown / unsupported languages. "
+            f"Default: {DEFAULT_LANGUAGE}"
+        ),
     )
     parser_tts.add_argument(
         "--steps", type=int, default=5, help="Quality steps (default: 5, higher=better)"

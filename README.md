@@ -7,11 +7,11 @@
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic-black?logo=github)](https://github.com/supertone-inc/supertonic)
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic--py-black?logo=github)](https://github.com/supertone-inc/supertonic-py)
 [![Documentation](https://img.shields.io/badge/Documentation-blue?logo=readthedocs&logoColor=white)](https://supertone-inc.github.io/supertonic-py/)
-[![Demo](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo-yellow)](https://huggingface.co/spaces/Supertone/supertonic-2)
-[![Models](https://img.shields.io/badge/🤗%20Hugging%20Face-Models-blue)](https://huggingface.co/Supertone/supertonic-2)
+[![Demo](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo-yellow)](https://huggingface.co/spaces/Supertone/supertonic-3)
+[![Models](https://img.shields.io/badge/🤗%20Hugging%20Face-Models-blue)](https://huggingface.co/Supertone/supertonic-3)
 [![PyPI version](https://badge.fury.io/py/supertonic.svg)](https://badge.fury.io/py/supertonic)
 
-> **Supertonic-2**: Now with multilingual support! 5 languages available: English, Korean, Spanish, Portuguese, and French.
+> **Supertonic-3**: Multilingual synthesis across **31 languages**, plus a `na` fallback for text whose language is unknown or outside the supported set.
 
 
 ## Quick Start
@@ -76,7 +76,7 @@ Supertonic has **minimal dependencies** - just 4 core libraries:
 
 **📱 On-Device Capable**: **Complete privacy** and **zero latency**
 
-**🌐 Multilingual (v2)**: Supports **5 languages** — English, Korean, Spanish, Portuguese, and French
+**🌐 Multilingual (v3)**: Supports **31 languages** plus a `na` fallback for unknown languages
 
 **🎨 Natural Text Handling**: Seamlessly processes complex expressions without G2P module
 
@@ -86,13 +86,23 @@ Supertonic has **minimal dependencies** - just 4 core libraries:
 
 ## Supported Languages
 
-| Language | Code | Example |
-|----------|------|---------|
-| English | `en` | "The train delay was announced at 4:45 PM on Wed, Apr 3, 2024." |
-| Korean | `ko` | "회의는 잠시 후에 시작되며 모두가 자리에 앉아 기다립니다." |
-| Spanish | `es` | "La reunión comienza pronto y todos se sientan en silencio para escuchar." |
-| Portuguese | `pt` | "A reunião começa em breve e todos se sentam em silêncio para ouvir." |
-| French | `fr` | "La réunion commence bientôt et tout le monde s’assoit en silence pour écouter." |
+Supertonic-3 supports the following 31 ISO codes, plus a special `na` fallback for unknown / unsupported languages:
+
+| Code | Language | Code | Language | Code | Language | Code | Language |
+|------|----------|------|----------|------|----------|------|----------|
+| `en` | English | `ko` | Korean | `ja` | Japanese | `ar` | Arabic |
+| `bg` | Bulgarian | `cs` | Czech | `da` | Danish | `de` | German |
+| `el` | Greek | `es` | Spanish | `et` | Estonian | `fi` | Finnish |
+| `fr` | French | `hi` | Hindi | `hr` | Croatian | `hu` | Hungarian |
+| `id` | Indonesian | `it` | Italian | `lt` | Lithuanian | `lv` | Latvian |
+| `nl` | Dutch | `pl` | Polish | `pt` | Portuguese | `ro` | Romanian |
+| `ru` | Russian | `sk` | Slovak | `sl` | Slovenian | `sv` | Swedish |
+| `tr` | Turkish | `uk` | Ukrainian | `vi` | Vietnamese | `na` | *unknown / fallback* |
+
+```python
+# Pick any supported code, or use 'na' for text whose language is unknown
+wav, _ = tts.synthesize("Some uncommon text.", voice_style=style, lang="na")
+```
 
 
 
@@ -166,7 +176,7 @@ We evaluated Supertonic's performance (with 2 inference steps) using two key met
 
 Supertonic is designed to handle complex, real-world text inputs that contain numbers, currency symbols, abbreviations, dates, and proper nouns.
 
-> 🎧 **View audio samples more easily**: Check out our [**Interactive Demo**](https://huggingface.co/spaces/Supertone/supertonic-2#text-handling) for a better viewing experience of all audio examples
+> 🎧 **View audio samples more easily**: Check out our [**Interactive Demo**](https://huggingface.co/spaces/Supertone/supertonic-3#text-handling) for a better viewing experience of all audio examples
 
 **Overview of Test Cases:**
 
@@ -333,15 +343,15 @@ This paper describes the self-purification technique for training flow matching 
 
 **🏠 Main Repository**: [github.com/supertone-inc/supertonic](https://github.com/supertone-inc/supertonic)
 
-**🎧 Try it live**: [Hugging Face Spaces](https://huggingface.co/spaces/Supertone/supertonic-2)
+**🎧 Try it live**: [Hugging Face Spaces](https://huggingface.co/spaces/Supertone/supertonic-3)
 
-**🤗 Model Repository**: [Hugging Face Models (Supertonic-2)](https://huggingface.co/Supertone/supertonic-2)
+**🤗 Model Repository**: [Hugging Face Models (Supertonic-3)](https://huggingface.co/Supertone/supertonic-3)
 
 ## License
 
 **Code**: [MIT License](LICENSE)
 
-**Model**: [OpenRAIL-M License](https://huggingface.co/Supertone/supertonic-2/blob/main/LICENSE)
+**Model**: [OpenRAIL-M License](https://huggingface.co/Supertone/supertonic-3/blob/main/LICENSE)
 
 
 Copyright © 2025 Supertone Inc.

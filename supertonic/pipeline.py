@@ -45,8 +45,9 @@ class TTS:
     """High-level interface for Supertonic text-to-speech synthesis.
 
     Args:
-        model: Model name to use ("supertonic" or "supertonic-2").
-            Default is "supertonic-2" (multilingual support).
+        model: Model name to use. One of ``"supertonic"`` (English only),
+            ``"supertonic-2"`` (5 languages), or ``"supertonic-3"`` (31
+            languages + ``"na"`` fallback). Default: ``"supertonic-3"``.
         model_dir: Directory containing model files. If None, uses default cache
             directory based on model name.
         auto_download: If True, automatically downloads model files from
@@ -70,14 +71,18 @@ class TTS:
         ```python
         from supertonic import TTS
 
-        # Use default model (supertonic-2 with multilingual support)
+        # Use default model (supertonic-3 with 31-language support)
         tts = TTS()
         style = tts.get_voice_style("M1")
         wav, dur = tts.synthesize("Hello!", voice_style=style, lang="en")
 
-        # Use specific model version
-        tts_v1 = TTS(model="supertonic")  # English only
-        tts_v2 = TTS(model="supertonic-2")  # Multilingual
+        # Unknown language fallback (supertonic-3)
+        wav, dur = tts.synthesize("Some text", voice_style=style, lang="na")
+
+        # Use a specific model version
+        tts_v1 = TTS(model="supertonic")    # English only
+        tts_v2 = TTS(model="supertonic-2")  # 5 languages
+        tts_v3 = TTS(model="supertonic-3")  # 31 languages + na
         ```
     """
 
@@ -92,7 +97,7 @@ class TTS:
         """Initialize the TTS engine.
 
         Args:
-            model: Model name ("supertonic" or "supertonic-2"). Default: "supertonic-2"
+            model: Model name. One of ``AVAILABLE_MODELS``. Default: ``"supertonic-3"``.
             model_dir (Union[Path, str]): Directory containing model files. If None, uses default
                 cache directory based on model name
             auto_download: If True, automatically downloads missing model files
@@ -172,12 +177,10 @@ class TTS:
             max_chunk_length: Max characters per chunk. If None, automatically
                 determined based on language (300 for most, 120 for Korean)
             silence_duration: Silence between chunks in seconds (default: 0.3)
-            lang: Language code for synthesis. Supported languages:
-                - "en": English (default)
-                - "ko": Korean
-                - "es": Spanish
-                - "pt": Portuguese
-                - "fr": French
+            lang: Language code for synthesis (default: ``"en"``).
+                See ``AVAILABLE_LANGUAGES`` for the full list of codes
+                supported by the loaded model. Supertonic-3 accepts 31
+                ISO codes plus ``"na"`` as a fallback for unknown languages.
             verbose: If True, print detailed progress information (default: False)
 
         Returns:
@@ -369,8 +372,10 @@ class TTS:
             max_chunk_length: Max characters per chunk. If None, automatically
                 determined based on language (300 for most, 120 for Korean)
             silence_duration: Silence between chunks in seconds (default: 0.3)
-            lang: Language code for synthesis (default: "en").
-                Supported: "en", "ko", "es", "pt", "fr"
+            lang: Language code for synthesis (default: ``"en"``).
+                See ``AVAILABLE_LANGUAGES`` for codes supported by the
+                loaded model. Use ``"na"`` for unknown languages
+                (supertonic-3 only).
             verbose: If True, print detailed progress information (default: False)
 
         Returns:

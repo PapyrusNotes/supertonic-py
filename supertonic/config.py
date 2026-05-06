@@ -12,8 +12,8 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 # Available models
-AVAILABLE_MODELS = ["supertonic", "supertonic-2"]
-DEFAULT_MODEL = "supertonic-2"
+AVAILABLE_MODELS = ["supertonic", "supertonic-2", "supertonic-3"]
+DEFAULT_MODEL = "supertonic-3"
 
 # Model configuration mapping
 MODEL_CONFIGS = {
@@ -25,6 +25,11 @@ MODEL_CONFIGS = {
     "supertonic-2": {
         "repo": "Supertone/supertonic-2",
         "cache_dir": "supertonic2",
+        "multilingual": True,
+    },
+    "supertonic-3": {
+        "repo": "Supertone/supertonic-3",
+        "cache_dir": "supertonic3",
         "multilingual": True,
     },
 }
@@ -41,7 +46,7 @@ def get_model_config(model_name: str) -> dict:
     """Get configuration for a specific model.
 
     Args:
-        model_name: Model name ("supertonic" or "supertonic-2")
+        model_name: Model name (one of ``AVAILABLE_MODELS``)
 
     Returns:
         Dictionary with model configuration (repo, cache_dir, multilingual)
@@ -60,7 +65,7 @@ def get_model_cache_dir(model_name: str) -> Path:
     """Get cache directory for a specific model.
 
     Args:
-        model_name: Model name ("supertonic" or "supertonic-2")
+        model_name: Model name (one of ``AVAILABLE_MODELS``)
 
     Returns:
         Path to the model's cache directory
@@ -73,7 +78,7 @@ def get_model_repo(model_name: str) -> str:
     """Get HuggingFace repo ID for a specific model.
 
     Args:
-        model_name: Model name ("supertonic" or "supertonic-2")
+        model_name: Model name (one of ``AVAILABLE_MODELS``)
 
     Returns:
         HuggingFace repository ID
@@ -86,7 +91,7 @@ def is_multilingual_model(model_name: str) -> bool:
     """Check if a model supports multilingual synthesis.
 
     Args:
-        model_name: Model name ("supertonic" or "supertonic-2")
+        model_name: Model name (one of ``AVAILABLE_MODELS``)
 
     Returns:
         True if model supports multiple languages
@@ -106,8 +111,48 @@ TEXT_ENC_ONNX_REL_PATH = ONNX_DIR / "text_encoder.onnx"
 VECTOR_EST_ONNX_REL_PATH = ONNX_DIR / "vector_estimator.onnx"
 VOCODER_ONNX_REL_PATH = ONNX_DIR / "vocoder.onnx"
 
-# Language configuration (supertonic-2 multilingual support)
-AVAILABLE_LANGUAGES = ["en", "ko", "es", "pt", "fr"]
+# Language configuration (multilingual support)
+# supertonic-3 supports 31 languages plus the special "na" fallback for unknown.
+# supertonic-2 supports a subset (en, ko, es, pt, fr) — language validation
+# only enforces membership in this list; mismatches between a model and a
+# language outside its training set are not blocked here.
+SUPPORTED_LANGUAGES = [
+    "en",  # English
+    "ko",  # Korean
+    "ja",  # Japanese
+    "ar",  # Arabic
+    "bg",  # Bulgarian
+    "cs",  # Czech
+    "da",  # Danish
+    "de",  # German
+    "el",  # Greek
+    "es",  # Spanish
+    "et",  # Estonian
+    "fi",  # Finnish
+    "fr",  # French
+    "hi",  # Hindi
+    "hr",  # Croatian
+    "hu",  # Hungarian
+    "id",  # Indonesian
+    "it",  # Italian
+    "lt",  # Lithuanian
+    "lv",  # Latvian
+    "nl",  # Dutch
+    "pl",  # Polish
+    "pt",  # Portuguese
+    "ro",  # Romanian
+    "ru",  # Russian
+    "sk",  # Slovak
+    "sl",  # Slovenian
+    "sv",  # Swedish
+    "tr",  # Turkish
+    "uk",  # Ukrainian
+    "vi",  # Vietnamese
+]
+# Special fallback code for unknown / unsupported language.
+# Wraps text with the <na>...</na> token so the model can still synthesize.
+UNKNOWN_LANGUAGE = "na"
+AVAILABLE_LANGUAGES = SUPPORTED_LANGUAGES + [UNKNOWN_LANGUAGE]
 DEFAULT_LANGUAGE = "en"
 
 # TTS parameters - defaults

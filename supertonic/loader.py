@@ -42,15 +42,16 @@ def get_cache_dir(model_name: Optional[str] = None) -> Path:
     """Get or create the cache directory for Supertonic models.
 
     Args:
-        model_name: Model name ("supertonic" or "supertonic-2").
+        model_name: Model name (one of ``AVAILABLE_MODELS``).
             If None, uses default cache directory.
 
     Returns:
         Path object pointing to the cache directory
 
     Note:
-        Default location is ~/.cache/supertonic2, but can be overridden
-        with SUPERTONIC_CACHE_DIR environment variable
+        Default location depends on the loaded model
+        (e.g., ``~/.cache/supertonic3`` for supertonic-3), but can be
+        overridden with the ``SUPERTONIC_CACHE_DIR`` environment variable.
     """
     if model_name is not None:
         cache_dir = get_model_cache_dir(model_name)
@@ -100,7 +101,7 @@ def download_model(model_dir: Union[Path, str], model_name: Optional[str] = None
 
     Args:
         model_dir: Directory where the model should be downloaded (str or Path)
-        model_name: Model name ("supertonic" or "supertonic-2").
+        model_name: Model name (one of ``AVAILABLE_MODELS``).
             If None, uses default model repository.
     """
     model_dir = Path(model_dir) if isinstance(model_dir, str) else model_dir
@@ -312,7 +313,7 @@ def load_model(
             None (default) lets ONNX Runtime auto-detect optimal value
         inter_op_num_threads: Number of threads for inter-op parallelism.
             None (default) lets ONNX Runtime auto-detect optimal value
-        model_name: Model name ("supertonic" or "supertonic-2").
+        model_name: Model name (one of ``AVAILABLE_MODELS``).
             Used for downloading the correct model if auto_download is True.
 
     Returns:

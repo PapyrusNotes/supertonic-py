@@ -38,7 +38,7 @@ pip install supertonic
         |-----------|-------------|---------|
         | `text` | Text to synthesize | *required* |
         | `voice_style` | Voice style object | *required* |
-        | `lang` | Language code: `en`, `ko`, `es`, `pt`, `fr` | `en` |
+        | `lang` | Language code (Supertonic-3: 31 codes + `na` fallback). See [Multilingual Support](#multilingual-support). | `en` |
         | `total_steps` | Quality: 2-15 typical (higher=better) | `5` |
         | `speed` | Speed: 0.7 (slow) to 2.0 (fast) | `1.05` |
         | `max_chunk_length` | Max characters per chunk | `300` |
@@ -66,7 +66,7 @@ pip install supertonic
         |--------|-------------|---------|
         | `-o`, `--output` | Output file path | *required* |
         | `--voice` | Voice style: M1, F1, M2, F2, ... | `M1` |
-        | `--lang` | Language: `en`, `ko`, `es`, `pt`, `fr` | `en` |
+        | `--lang` | Language (Supertonic-3: 31 codes + `na` fallback). See [Multilingual Support](#multilingual-support). | `en` |
         | `--steps` | Quality steps: 2-15 typical | `5` |
         | `--speed` | Speed multiplier: 0.7-2.0 | `1.05` |
         | `--max-chunk-length` | Characters per chunk | `300` |
@@ -95,15 +95,20 @@ Run and experiment with Supertonic in Google Colab:
 
 ### Multilingual Support
 
-Supertonic-2 supports 5 languages with natural text handling:
+Supertonic-3 supports **31 languages** with natural text handling, plus a special `na` fallback for unknown / unsupported languages.
 
-| Language | Code | Example |
-|----------|------|---------|
-| English | `en` | "The train delay was announced at 4:45 PM." |
-| Korean | `ko` | "회의는 2024년 4월 3일 수요일 오후 4시 45분에 시작됩니다." |
-| Spanish | `es` | "La reunión se programó para las 4:45 PM del miércoles." |
-| Portuguese | `pt` | "A reunião foi agendada para as 16h45 de quarta-feira." |
-| French | `fr` | "La réunion est prévue pour 16h45 le mercredi 3 avril." |
+=== "Supported codes"
+
+    | Code | Language | Code | Language | Code | Language | Code | Language |
+    |------|----------|------|----------|------|----------|------|----------|
+    | `en` | English | `ko` | Korean | `ja` | Japanese | `ar` | Arabic |
+    | `bg` | Bulgarian | `cs` | Czech | `da` | Danish | `de` | German |
+    | `el` | Greek | `es` | Spanish | `et` | Estonian | `fi` | Finnish |
+    | `fr` | French | `hi` | Hindi | `hr` | Croatian | `hu` | Hungarian |
+    | `id` | Indonesian | `it` | Italian | `lt` | Lithuanian | `lv` | Latvian |
+    | `nl` | Dutch | `pl` | Polish | `pt` | Portuguese | `ro` | Romanian |
+    | `ru` | Russian | `sk` | Slovak | `sl` | Slovenian | `sv` | Swedish |
+    | `tr` | Turkish | `uk` | Ukrainian | `vi` | Vietnamese | `na` | *unknown / fallback* |
 
 === "Python"
 
@@ -119,14 +124,14 @@ Supertonic-2 supports 5 languages with natural text handling:
     # Korean
     wav_ko, _ = tts.synthesize("안녕하세요! 수퍼토닉에 오신 것을 환영합니다.", voice_style=style, lang="ko")
 
-    # Spanish
-    wav_es, _ = tts.synthesize("¡Hola! Bienvenido a Supertonic.", voice_style=style, lang="es")
+    # Japanese
+    wav_ja, _ = tts.synthesize("こんにちは！スーパートニックへようこそ。", voice_style=style, lang="ja")
 
-    # Portuguese
-    wav_pt, _ = tts.synthesize("Olá! Bem-vindo ao Supertonic.", voice_style=style, lang="pt")
+    # German
+    wav_de, _ = tts.synthesize("Hallo! Willkommen bei Supertonic.", voice_style=style, lang="de")
 
-    # French
-    wav_fr, _ = tts.synthesize("Bonjour! Bienvenue sur Supertonic.", voice_style=style, lang="fr")
+    # Unknown language fallback — wraps text with the <na> token
+    wav_na, _ = tts.synthesize("Some uncommon text.", voice_style=style, lang="na")
 
     tts.save_audio(wav_ko, "output_korean.wav")
     ```
@@ -140,14 +145,14 @@ Supertonic-2 supports 5 languages with natural text handling:
     # Korean
     supertonic tts '안녕하세요! 수퍼토닉에 오신 것을 환영합니다.' --lang ko -o output_ko.wav
 
-    # Spanish
-    supertonic tts '¡Hola! Bienvenido a Supertonic.' --lang es -o output_es.wav
+    # Japanese
+    supertonic tts 'こんにちは！スーパートニックへようこそ。' --lang ja -o output_ja.wav
 
-    # Portuguese
-    supertonic tts 'Olá! Bem-vindo ao Supertonic.' --lang pt -o output_pt.wav
+    # German
+    supertonic tts 'Hallo! Willkommen bei Supertonic.' --lang de -o output_de.wav
 
-    # French
-    supertonic tts 'Bonjour! Bienvenue sur Supertonic.' --lang fr -o output_fr.wav
+    # Unknown language fallback
+    supertonic tts 'Some uncommon text.' --lang na -o output_na.wav
     ```
 
 ---

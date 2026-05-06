@@ -230,10 +230,12 @@ class UnicodeProcessor:
 
         Args:
             text: Preprocessed text
-            lang: Language code (en, ko, es, pt, fr)
+            lang: Language code from ``AVAILABLE_LANGUAGES`` (or ``"na"``
+                for unknown / unsupported languages)
 
         Returns:
-            Text wrapped with language tokens: <lang>text</lang>
+            Text wrapped with language tokens: ``<lang>text</lang>``
+            (e.g., ``<en>...</en>`` or ``<na>...</na>``)
         """
         if lang not in AVAILABLE_LANGUAGES:
             raise ValueError(
@@ -259,7 +261,10 @@ class UnicodeProcessor:
 
         Args:
             text: Raw input text
-            lang: Language code for multilingual support (en, ko, es, pt, fr).
+            lang: Language code for multilingual support. Supertonic-3
+                supports 31 ISO codes plus the ``"na"`` fallback for
+                unknown languages; Supertonic-2 supports
+                ``en``, ``ko``, ``es``, ``pt``, ``fr``.
                 If None, no language tokens are added (v1 compatibility).
 
         Returns:
@@ -280,7 +285,7 @@ class UnicodeProcessor:
         text = self._clean_whitespace(text)
         text = self._add_period_if_needed(text)
 
-        # Add language tokens for multilingual models (supertonic-2)
+        # Add language tokens for multilingual models (supertonic-2 / supertonic-3)
         if lang is not None:
             text = self._add_language_token(text, lang)
 
@@ -334,7 +339,8 @@ class UnicodeProcessor:
 
         Args:
             text_list: List of text strings to process
-            lang: Language code for multilingual support (en, ko, es, pt, fr).
+            lang: Language code for multilingual support. Use any code from
+                ``AVAILABLE_LANGUAGES`` (or ``"na"`` for unknown languages).
                 If None, no language tokens are added (v1 compatibility).
 
         Returns:
@@ -476,13 +482,10 @@ class Supertonic:
             style: Voice style object containing style vectors
             total_step: Number of diffusion steps (higher = better quality, slower)
             speed: Speech speed multiplier (0.7 = slower, 2.0 = faster)
-            lang: Language code for multilingual support (en, ko, es, pt, fr).
-                Required for supertonic-2 model. Supported languages:
-                - "en": English
-                - "ko": Korean
-                - "es": Spanish
-                - "pt": Portuguese
-                - "fr": French
+            lang: Language code for multilingual support.
+                Required for multilingual models (supertonic-2 / supertonic-3).
+                See ``AVAILABLE_LANGUAGES`` for the full list. Use ``"na"``
+                for unknown / unsupported languages (supertonic-3 only).
 
         Returns:
             Tuple of (waveform, duration):
