@@ -8,7 +8,9 @@ supertonic say TEXT [OPTIONS]
 supertonic tts TEXT -o OUTPUT.wav [OPTIONS]
 
 # Options:
-#   --voice STYLE             Voice style: M1, M2, F1, F2 (default: M1)
+#   --model NAME              Model: supertonic, supertonic-2, supertonic-3 (default: supertonic-3)
+#   --voice STYLE             Voice style: M1, M2, F1, F2, ... (default: M1)
+#   --lang CODE               Language code (supertonic-3: 31 ISO codes + 'na'; default: en)
 #   --steps N                 Quality steps: 2-15 typical (default: 5)
 #   --speed RATE              Speed multiplier: 0.7-2.0 (default: 1.05)
 #   --max-chunk-length N      Characters per chunk (default: 300)
@@ -141,7 +143,7 @@ Override the default cache directory for model files.
 export SUPERTONIC_CACHE_DIR=/custom/cache/path
 ```
 
-Default: `~/.cache/supertonic`
+Default: `~/.cache/supertonic3` (depends on the loaded model — e.g., `~/.cache/supertonic2` for supertonic-2)
 
 **`SUPERTONIC_INTRA_OP_THREADS`**
 

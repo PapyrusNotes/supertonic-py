@@ -138,7 +138,7 @@ python test1_simple.py
 
 ## Notes
 
-- Models loaded from `~/.cache/supertonic/models`
+- Models loaded from `~/.cache/supertonic3` by default (depends on the active model)
 - First run auto-downloads model from HuggingFace
 - CPU-only inference for stability
 - Thread count: Auto-detected by ONNX Runtime (configurable via initialization or environment variables if needed)

@@ -174,6 +174,24 @@ def test_unicode_processor_file_not_found():
         UnicodeProcessor("/nonexistent/path/indexer.json")
 
 
+def test_add_language_token_supported(processor):
+    """Language tokens should be wrapped as ``<code>...</code>``."""
+    wrapped = processor._add_language_token("Hello.", "en")
+    assert wrapped == "<en>Hello.</en>"
+
+
+def test_add_language_token_na_fallback(processor):
+    """The 'na' fallback should produce ``<na>...</na>`` for unknown languages."""
+    wrapped = processor._add_language_token("Some text.", "na")
+    assert wrapped == "<na>Some text.</na>"
+
+
+def test_add_language_token_invalid(processor):
+    """Unknown language codes should raise ValueError."""
+    with pytest.raises(ValueError, match="Invalid language"):
+        processor._add_language_token("Hello.", "xx")
+
+
 def test_unicode_processor_malformed_json():
     """Test that ValueError is raised for malformed JSON."""
     with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:

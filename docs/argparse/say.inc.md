@@ -4,11 +4,11 @@ Text to synthesize and play
 
 #### `--model`
 
-Possible choices: `supertonic`, `supertonic-2`
+Possible choices: `supertonic`, `supertonic-2`, `supertonic-3`
 
-Model to use: supertonic (English only) or supertonic-2 (multilingual). Default: supertonic-2
+Model to use: supertonic (English only), supertonic-2 (5 languages), or supertonic-3 (31 languages + 'na' fallback). Default: supertonic-3
 
-Default: `supertonic-2`
+Default: `supertonic-3`
 
 #### `--voice`
 
@@ -22,9 +22,9 @@ Path to custom voice style JSON file (overrides --voice if provided)
 
 #### `--lang`
 
-Possible choices: `en`, `ko`, `es`, `pt`, `fr`
+Possible choices: `en`, `ko`, `ja`, `ar`, `bg`, `cs`, `da`, `de`, `el`, `es`, `et`, `fi`, `fr`, `hi`, `hr`, `hu`, `id`, `it`, `lt`, `lv`, `nl`, `pl`, `pt`, `ro`, `ru`, `sk`, `sl`, `sv`, `tr`, `uk`, `vi`, `na`
 
-Language code: en (English), ko (Korean), es (Spanish), pt (Portuguese), fr (French). Default: en
+Language code (supertonic-3): en, ko, ja, ar, bg, cs, da, de, el, es, et, fi, fr, hi, hr, hu, id, it, lt, lv, nl, pl, pt, ro, ru, sk, sl, sv, tr, uk, vi, or 'na' for unknown / unsupported languages. Default: en
 
 Default: `en`
 

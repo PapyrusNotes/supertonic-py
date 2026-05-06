@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "supertonic"
-version = "1.1.2"
+version = "1.2.0"
 description = "High-quality Text-to-Speech synthesis with ONNX Runtime"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -69,8 +69,8 @@ Homepage = "https://github.com/supertone-inc/supertonic"
 Repository = "https://github.com/supertone-inc/supertonic-py"
 Documentation = "https://supertone-inc.github.io/supertonic-py"
 Issues = "https://github.com/supertone-inc/supertonic-py/issues"
-Demo = "https://huggingface.co/spaces/Supertone/supertonic-2"
-"Model Hub" = "https://huggingface.co/Supertone/supertonic-2"
+Demo = "https://huggingface.co/spaces/Supertone/supertonic-3"
+"Model Hub" = "https://huggingface.co/Supertone/supertonic-3"
 
 [project.scripts]
 supertonic = "supertonic.cli:main"

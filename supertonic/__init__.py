@@ -4,12 +4,13 @@ Supertonic is a high-performance, on-device text-to-speech system powered by
 ONNX Runtime. It delivers state-of-the-art speech synthesis with unprecedented
 speed and efficiency.
 
-Supertonic-2 supports multilingual synthesis with 5 languages:
-- English (en)
-- Korean (ko)
-- Spanish (es)
-- Portuguese (pt)
-- French (fr)
+Supertonic-3 (default) supports multilingual synthesis across 31 languages:
+
+    en, ko, ja, ar, bg, cs, da, de, el, es, et, fi, fr, hi, hr, hu, id,
+    it, lt, lv, nl, pl, pt, ro, ru, sk, sl, sv, tr, uk, vi
+
+For text whose language is unknown or outside this set, pass ``lang="na"``
+to fall back to the language-agnostic ``<na>`` token.
 
 Example:
     ```python
@@ -24,6 +25,9 @@ Example:
     # Korean
     wav_ko, _ = tts.synthesize("안녕하세요!", voice_style=style, lang="ko")
 
+    # Unknown language fallback
+    wav_na, _ = tts.synthesize("Some text", voice_style=style, lang="na")
+
     tts.save_audio(wav, "output.wav")
     ```
 """
@@ -32,11 +36,18 @@ from __future__ import annotations
 
 import logging
 
-from .config import AVAILABLE_LANGUAGES, AVAILABLE_MODELS, DEFAULT_LANGUAGE, DEFAULT_MODEL
+from .config import (
+    AVAILABLE_LANGUAGES,
+    AVAILABLE_MODELS,
+    DEFAULT_LANGUAGE,
+    DEFAULT_MODEL,
+    SUPPORTED_LANGUAGES,
+    UNKNOWN_LANGUAGE,
+)
 from .core import Style, UnicodeProcessor
 from .pipeline import TTS
 
-__version__ = "1.1.2"
+__version__ = "1.2.0"
 
 __all__ = [
     "TTS",
@@ -46,6 +57,8 @@ __all__ = [
     "AVAILABLE_MODELS",
     "DEFAULT_LANGUAGE",
     "DEFAULT_MODEL",
+    "SUPPORTED_LANGUAGES",
+    "UNKNOWN_LANGUAGE",
     "__version__",
 ]
 

@@ -6,11 +6,11 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic-black?logo=github)](https://github.com/supertone-inc/supertonic)
 [![GitHub](https://img.shields.io/badge/GitHub-supertonic--py-black?logo=github)](https://github.com/supertone-inc/supertonic-py)
-[![Demo](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo-yellow)](https://huggingface.co/spaces/Supertone/supertonic-2)
-[![Models](https://img.shields.io/badge/🤗%20Hugging%20Face-Models-blue)](https://huggingface.co/Supertone/supertonic-2)
+[![Demo](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo-yellow)](https://huggingface.co/spaces/Supertone/supertonic-3)
+[![Models](https://img.shields.io/badge/🤗%20Hugging%20Face-Models-blue)](https://huggingface.co/Supertone/supertonic-3)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/supertone-inc/supertonic-py/blob/main/notebook/supertonic_demo.ipynb)
 
-> **Supertonic-2**: Now with multilingual support! 5 languages available: English, Korean, Spanish, Portuguese, and French.
+> **Supertonic-3**: Multilingual synthesis across **31 languages** plus a `na` fallback for text whose language is unknown or outside the supported set.
 
 ## Quick Start
 
@@ -77,7 +77,7 @@ Supertonic has **minimal dependencies** - just 4 core libraries:
 
 **📱 On-Device Capable**: **Complete privacy** and **zero latency**
 
-**🌐 Multilingual (v2)**: Supports **5 languages** — English, Korean, Spanish, Portuguese, and French
+**🌐 Multilingual (v3)**: Supports **31 languages** plus a `na` fallback for unknown languages
 
 **🎨 Natural Text Handling**: Seamlessly processes complex expressions without G2P module
 
@@ -311,15 +311,15 @@ This paper describes the self-purification technique for training flow matching 
 
 **🏠 Main Repository**: [github.com/supertone-inc/supertonic](https://github.com/supertone-inc/supertonic)
 
-**🎧 Try it live**: [Hugging Face Spaces](https://huggingface.co/spaces/Supertone/supertonic-2)
+**🎧 Try it live**: [Hugging Face Spaces](https://huggingface.co/spaces/Supertone/supertonic-3)
 
-**🤗 Model Repository**: [Hugging Face Models](https://huggingface.co/Supertone/supertonic-2)
+**🤗 Model Repository**: [Hugging Face Models](https://huggingface.co/Supertone/supertonic-3)
 
 ## License
 
 **Code**: [MIT License](https://github.com/supertone-inc/supertonic-py/blob/main/LICENSE)
 
-**Model**: [OpenRAIL-M License](https://huggingface.co/Supertone/supertonic-2/blob/main/LICENSE)
+**Model**: [OpenRAIL-M License](https://huggingface.co/Supertone/supertonic-3/blob/main/LICENSE)
 
 
 Copyright © 2025 Supertone Inc.
