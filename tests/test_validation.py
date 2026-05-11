@@ -140,6 +140,28 @@ def test_validate_text_whitespace_only(processor):
     assert len(unsupported) == 0
 
 
+def test_preprocess_preserves_decomposed_umlauts(processor):
+    """German umlauts should survive NFKD as base vowel + combining diaeresis."""
+    text = "Das ist schon schön. Die Küche ist kühl."
+    preprocessed = processor._preprocess_text(text, lang="de")
+
+    assert "\u0308" in preprocessed
+    assert "scho\u0308n" in preprocessed
+    assert "Ku\u0308che" in preprocessed
+    assert "ku\u0308hl" in preprocessed
+
+
+def test_preprocess_preserves_russian_diacritic_distinctions(processor):
+    """Russian Й/Ё distinctions should survive NFKD as combining marks."""
+    text = "Наш герой сказал, что всё будет хорошо."
+    preprocessed = processor._preprocess_text(text, lang="ru")
+
+    assert "\u0306" in preprocessed  # й -> и + combining breve
+    assert "\u0308" in preprocessed  # ё -> е + combining diaeresis
+    assert "герои\u0306" in preprocessed
+    assert "все\u0308" in preprocessed
+
+
 def test_indexer_type_validation():
     """Test that indexer must be a list."""
     with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
