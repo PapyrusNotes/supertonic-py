@@ -10,9 +10,9 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
 authors = [
-    {name = "Kim, Hyeongju", email = "hyeongju@supertone.ai"},
     {name = "Yu, Yechan", email = "ato@supertone.ai"},
     {name = "Lee, Juheon", email = "juheon@supertone.ai"},
+    {name = "Kim, Hyeongju", email = "hyeongju@supertone.ai"},
 ]
 maintainers = [
     {name = "Supertone Inc.", email = "contact@supertone.ai"},
