@@ -59,10 +59,6 @@ _SYMBOL_REPLACEMENTS = {
     "←": " ",
 }
 
-_DIACRITICS_PATTERN = re.compile(
-    r"[\u0302\u0303\u0304\u0305\u0306\u0307\u0308\u030A\u030B\u030C\u0327\u0328\u0329\u032A\u032B\u032C\u032D\u032E\u032F]"
-)
-
 _SPECIAL_SYMBOLS_PATTERN = re.compile(r"[♥☆♡©\\]")
 
 _PUNCTUATION_SPACING_PATTERNS = [
@@ -181,11 +177,8 @@ class UnicodeProcessor:
             text = text.replace(old, new)
         return text
 
-    def _remove_diacritics_and_special_chars(self, text: str) -> str:
-        """Remove combining diacritics and special symbols."""
-        # Remove combining diacritics using pre-compiled pattern
-        text = _DIACRITICS_PATTERN.sub("", text)
-        # Remove special symbols using pre-compiled pattern
+    def _remove_special_chars(self, text: str) -> str:
+        """Remove unsupported decorative symbols while preserving diacritics."""
         text = _SPECIAL_SYMBOLS_PATTERN.sub("", text)
         return text
 
@@ -251,7 +244,7 @@ class UnicodeProcessor:
         1. Unicode normalization (NFKD)
         2. Emoji removal
         3. Symbol normalization
-        4. Diacritics and special character removal
+        4. Decorative symbol removal
         5. Abbreviation expansion
         6. Punctuation spacing fixes
         7. Duplicate quote removal
@@ -278,7 +271,7 @@ class UnicodeProcessor:
 
         text = self._remove_emojis(text)
         text = self._normalize_symbols(text)
-        text = self._remove_diacritics_and_special_chars(text)
+        text = self._remove_special_chars(text)
         text = self._expand_abbreviations(text)
         text = self._fix_punctuation_spacing(text)
         text = self._remove_duplicate_quotes(text)
