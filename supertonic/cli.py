@@ -12,7 +12,7 @@ import sys
 import time
 
 from . import __version__
-from .config import AVAILABLE_LANGUAGES, AVAILABLE_MODELS, DEFAULT_LANGUAGE, DEFAULT_MODEL
+from .config import AVAILABLE_LANGUAGES, AVAILABLE_MODELS, DEFAULT_MODEL
 from .pipeline import TTS
 
 logger = logging.getLogger(__name__)
