@@ -17,13 +17,15 @@ pip install supertonic
     ```python
     from supertonic import TTS
 
-    # Note: First run downloads model automatically (~305MB)
+    # Note: First run downloads model automatically (~400MB)
     tts = TTS(auto_download=True)
 
-    # Get a voice style
+    # Get a voice style (10 built-in: M1–M5, F1–F5)
     style = tts.get_voice_style(voice_name="F3")
 
-    # Generate speech (English - default)
+    # Generate speech. `lang` is optional — Supertonic-3 auto-resolves to
+    # the "na" fallback (so unknown text just works); pass an ISO code to
+    # opt into language-specific handling.
     text = "The train delay was announced at 4:45 PM on Wed, Apr 3, 2024 due to track maintenance."
     wav, duration = tts.synthesize(text, voice_style=style, lang="en")
     # wav: np.ndarray, shape = (1, num_samples)
@@ -38,8 +40,8 @@ pip install supertonic
         |-----------|-------------|---------|
         | `text` | Text to synthesize | *required* |
         | `voice_style` | Voice style object | *required* |
-        | `lang` | Language code (Supertonic-3: 31 codes + `na` fallback). See [Multilingual Support](#multilingual-support). | `en` |
-        | `total_steps` | Quality: 2-15 typical (higher=better) | `5` |
+        | `lang` | Language code (Supertonic-3: 31 codes + `na` fallback). See [Multilingual Support](#multilingual-support). | auto (`na` for v2/v3, `en` for v1) |
+        | `total_steps` | Quality: 5-12 typical (higher=better) | `8` |
         | `speed` | Speed: 0.7 (slow) to 2.0 (fast) | `1.05` |
         | `max_chunk_length` | Max characters per chunk | `300` |
         | `silence_duration` | Silence between chunks (seconds) | `0.3` |
@@ -54,7 +56,7 @@ pip install supertonic
 === "CLI"
 
     ```bash
-    # Note: First run downloads model automatically (~305MB)
+    # Note: First run downloads model automatically (~400MB)
     supertonic tts 'Supertonic is a lightning fast, on-device TTS system.' -o output.wav
 
     # Multilingual support
@@ -65,9 +67,9 @@ pip install supertonic
         | Option | Description | Default |
         |--------|-------------|---------|
         | `-o`, `--output` | Output file path | *required* |
-        | `--voice` | Voice style: M1, F1, M2, F2, ... | `M1` |
-        | `--lang` | Language (Supertonic-3: 31 codes + `na` fallback). See [Multilingual Support](#multilingual-support). | `en` |
-        | `--steps` | Quality steps: 2-15 typical | `5` |
+        | `--voice` | Voice style: M1–M5, F1–F5 (10 built-in) | `M1` |
+        | `--lang` | Language (Supertonic-3: 31 codes + `na` fallback). See [Multilingual Support](#multilingual-support). | auto (`na` for v2/v3, `en` for v1) |
+        | `--steps` | Quality steps: 5-12 typical | `8` |
         | `--speed` | Speed multiplier: 0.7-2.0 | `1.05` |
         | `--max-chunk-length` | Characters per chunk | `300` |
         | `--silence-duration` | Silence between chunks (seconds) | `0.3` |
@@ -118,7 +120,7 @@ Supertonic-3 supports **31 languages** with natural text handling, plus a specia
     tts = TTS()
     style = tts.get_voice_style("M1")
 
-    # English (default)
+    # English
     wav_en, _ = tts.synthesize("Hello, welcome to Supertonic!", voice_style=style, lang="en")
 
     # Korean
@@ -139,7 +141,7 @@ Supertonic-3 supports **31 languages** with natural text handling, plus a specia
 === "CLI"
 
     ```bash
-    # English (default)
+    # English
     supertonic tts 'Hello, welcome to Supertonic!' -o output_en.wav
 
     # Korean
@@ -168,8 +170,8 @@ Supertonic provides multiple built-in voice styles to choose from:
 
     tts = TTS()
 
-    # List available voices
-    voice_list = tts.voice_style_names  # ex) ['M1', 'M2', 'F1', 'F2']
+    # List available voices (10 built-in: M1–M5, F1–F5)
+    voice_list = tts.voice_style_names
 
     # Try different voices
     for voice_name in voice_list:

@@ -1,11 +1,14 @@
 # Official Python Package for Supertonic
 
 <p align="center">
-  <img src="assets/images/supertonic_preview_0.1.jpg" alt="Supertonic Banner">
+  <img src="assets/images/Supertonic3_HeroImage.png" alt="Supertonic Banner">
 </p>
 
-[![GitHub](https://img.shields.io/badge/GitHub-supertonic-black?logo=github)](https://github.com/supertone-inc/supertonic)
-[![GitHub](https://img.shields.io/badge/GitHub-supertonic--py-black?logo=github)](https://github.com/supertone-inc/supertonic-py)
+[![GitHub | Official Repo](https://img.shields.io/badge/GitHub-Official%20Repo-black?logo=github)](https://github.com/supertone-inc/supertonic)
+[![GitHub | Python Package](https://img.shields.io/badge/GitHub-Python%20Package-black?logo=github)](https://github.com/supertone-inc/supertonic-py)
+[![Docs | Python PyPI](https://img.shields.io/badge/Docs-Python%20PyPI-blue?logo=readthedocs&logoColor=white)](https://github.com/supertone-inc/supertonic-py)
+[![DemoPage | Audio Samples](https://img.shields.io/badge/DemoPage-Audio%20Samples-F5D90A?labelColor=0B0C0E)](https://supertonic3.github.io/)
+[![Voice Builder | Cloning Demo](https://img.shields.io/badge/Voice%20Builder-Cloning%20Demo-3457D5?logo=soundcloud&logoColor=white)](https://supertonic.supertone.ai/voice_builder)
 [![Demo](https://img.shields.io/badge/🤗%20Hugging%20Face-Demo-yellow)](https://huggingface.co/spaces/Supertone/supertonic-3)
 [![Models](https://img.shields.io/badge/🤗%20Hugging%20Face-Models-blue)](https://huggingface.co/Supertone/supertonic-3)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/supertone-inc/supertonic-py/blob/main/notebook/supertonic_demo.ipynb)
@@ -18,42 +21,72 @@
 pip install supertonic
 ```
 
-### CLI
-
-```bash
-# Note: First run will download the model (~305MB) from HuggingFace
-supertonic tts 'Supertonic is a lightning fast, on-device TTS system.' -o output.wav
-
-# Multilingual support - each language with natural text handling
-supertonic tts '회의는 잠시 후에 시작되며 모두가 자리에 앉아 기다립니다.' -o korean.wav --lang ko
-supertonic tts 'La reunión comienza pronto y todos se sientan en silencio para escuchar.' -o spanish.wav --lang es
-supertonic tts 'A reunião começa em breve e todos se sentam em silêncio para ouvir.' -o portuguese.wav --lang pt
-supertonic tts 'La réunion commence bientôt et tout le monde s’assoit en silence pour écouter.' -o french.wav --lang fr
-```
-
 ### Python
+
+Every parameter is annotated inline, so the snippet doubles as
+copy-and-paste documentation for an LLM assistant:
 
 ```python
 from supertonic import TTS
 
-# Note: First run downloads model automatically (~305MB)
-tts = TTS(auto_download=True)
+# Note: first run downloads the model (~400MB) into ~/.cache/supertonic3/
+tts = TTS(auto_download=True)       # Initialize TTS engine
 
-# Get a voice style
-style = tts.get_voice_style(voice_name="M1")
+style = tts.get_voice_style(voice_name="M1")   # 10 built-in voices: M1–M5, F1–F5
 
-# Generate speech (English - default)
-text = "The train delay was announced at 4:45 PM on Wed, Apr 3, 2024 due to track maintenance."
-wav, duration = tts.synthesize(text, voice_style=style, lang="en")
+wav, duration = tts.synthesize(
+    text="Supertonic is a lightning fast, on-device TTS system.",
+    voice_style=style,              # Voice style object
+    total_steps=8,                  # Quality: 5 (low) to 12 (high), default 8
+    speed=1.05,                     # Speed: 0.7 (slow) to 2.0 (fast)
+    max_chunk_length=300,           # Max characters per chunk (auto: 120 for Korean)
+    silence_duration=0.3,           # Silence between chunks (seconds)
+    lang="en",                      # ISO code; see "Supported Languages" below
+    verbose=False,                  # Show detailed progress (default: False)
+)
+tts.save_audio(wav, "output.wav")
 
-# Multilingual synthesis - each language with natural text handling
+# Multilingual — just swap `lang` and the input text
 wav_ko, _ = tts.synthesize("회의는 잠시 후에 시작되며 모두가 자리에 앉아 기다립니다.", voice_style=style, lang="ko")
 wav_es, _ = tts.synthesize("La reunión comienza pronto y todos se sientan en silencio para escuchar.", voice_style=style, lang="es")
-wav_pt, _ = tts.synthesize("A reunião começa em breve e todos se sentam em silêncio para ouvir.", voice_style=style, lang="pt")
-wav_fr, _ = tts.synthesize("La réunion commence bientôt et tout le monde s’assoit en silence pour écouter.", voice_style=style, lang="fr")
+```
 
-# Save to file
-tts.save_audio(wav, "output.wav")
+#### Custom voices (Voice Builder)
+
+`get_voice_style()` loads one of the ten built-in voices (M1–M5, F1–F5).
+To use a voice created in
+[Voice Builder](https://supertonic.supertone.ai/voice_builder)
+(zero-shot cloning from a short reference clip), pass its JSON export to
+`get_voice_style_from_path()`:
+
+```python
+# Any voice-style JSON works here:
+#   - a Voice Builder export, or
+#   - one of the bundled defaults at
+#     ~/.cache/supertonic3/voice_styles/{M1..M5,F1..F5}.json
+#     (downloaded alongside the model on first run)
+style = tts.get_voice_style_from_path("~/voices/my_voice.json")
+wav, _ = tts.synthesize("Hello in my own cloned voice.", voice_style=style, lang="en")
+```
+
+### CLI
+
+```bash
+# Note: first run will download the model (~400MB) from HuggingFace
+supertonic tts 'Supertonic is a lightning fast, on-device TTS system.' -o output.wav
+
+# Pick a built-in voice and bump quality
+supertonic tts 'Use a different voice.' -o output.wav --voice F1 --steps 10
+
+# Use a custom voice — Voice Builder export, or a bundled
+# ~/.cache/supertonic3/voice_styles/*.json file
+supertonic tts 'Hello in my own cloned voice.' -o output.wav \
+  --custom-style-path ~/voices/my_voice.json
+
+# Multilingual support — each language with natural text handling
+supertonic tts '회의는 잠시 후에 시작되며 모두가 자리에 앉아 기다립니다.' -o korean.wav --lang ko
+supertonic tts 'La reunión comienza pronto y todos se sientan en silencio para escuchar.' -o spanish.wav --lang es
+supertonic tts 'A reunião começa em breve e todos se sentam em silêncio para ouvir.' -o portuguese.wav --lang pt
 ```
 
 [Get Started with the Full Guide](quickstart.md){ .md-button .md-button--primary }
@@ -85,7 +118,25 @@ Supertonic has **minimal dependencies** - just 4 core libraries:
 
 **🧩 Flexible Deployment**: Deploy across servers, browsers, and edge devices
 
+## Supported Languages
 
+Supertonic-3 supports the following 31 ISO codes, plus a special `na` fallback for unknown / unsupported languages:
+
+| Code | Language | Code | Language | Code | Language | Code | Language |
+|------|----------|------|----------|------|----------|------|----------|
+| `en` | English | `ko` | Korean | `ja` | Japanese | `ar` | Arabic |
+| `bg` | Bulgarian | `cs` | Czech | `da` | Danish | `de` | German |
+| `el` | Greek | `es` | Spanish | `et` | Estonian | `fi` | Finnish |
+| `fr` | French | `hi` | Hindi | `hr` | Croatian | `hu` | Hungarian |
+| `id` | Indonesian | `it` | Italian | `lt` | Lithuanian | `lv` | Latvian |
+| `nl` | Dutch | `pl` | Polish | `pt` | Portuguese | `ro` | Romanian |
+| `ru` | Russian | `sk` | Slovak | `sl` | Slovenian | `sv` | Swedish |
+| `tr` | Turkish | `uk` | Ukrainian | `vi` | Vietnamese | `na` | *unknown / fallback* |
+
+```python
+# Pick any supported code, or use 'na' for text whose language is unknown
+wav, _ = tts.synthesize("Some uncommon text.", voice_style=style, lang="na")
+```
 
 ## Performance Benchmarks
 
