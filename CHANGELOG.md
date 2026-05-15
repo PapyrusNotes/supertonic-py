@@ -8,6 +8,23 @@ This project broadly follows [Semantic Versioning](https://semver.org/spec/v2.0.
 shifts in `total_steps` and `lang` that are semver-minor in nature but are
 shipping under a patch bump on purpose.**
 
+## [1.2.3] — 2026-05-15
+
+### Fixed
+- Raise the `onnxruntime` lower bound to `>=1.19.0`. `onnxruntime` 1.18
+  and earlier shipped wheels built against the numpy 1.x C ABI, so
+  installing them alongside `numpy>=2.0` — which became possible in
+  1.2.2 via #1 ("Drop numpy<2.0 upper bound") — produced `ImportError`
+  or segfault at module import time. `onnxruntime` 1.19.0 (Aug 2024) is
+  the first release with explicit numpy 2.x support
+  ([release notes](https://github.com/microsoft/onnxruntime/releases/tag/v1.19.0):
+  *"Numpy support for 2.x has been added"*), so this bump unblocks the
+  numpy 2.x co-install scenario that motivated #1 (e.g. running side by
+  side with `kokoro-onnx>=0.5`).
+- Drop the residual `numpy<2.0` pin in `requirements.txt` that #1
+  missed — only `pyproject.toml` was touched in that PR, leaving
+  `requirements.txt` inconsistent with the package spec.
+
 ## [1.2.2] — Unreleased
 
 ### Heads-up — soft behavior changes in this patch
