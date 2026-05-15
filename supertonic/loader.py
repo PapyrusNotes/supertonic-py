@@ -20,8 +20,8 @@ from .config import (
     DEFAULT_CACHE_DIR,
     DEFAULT_INTER_OP_NUM_THREADS,
     DEFAULT_INTRA_OP_NUM_THREADS,
+    DEFAULT_MODEL,
     DEFAULT_MODEL_REPO,
-    DEFAULT_MODEL_REVISION,
     DEFAULT_ONNX_PROVIDERS,
     DP_ONNX_REL_PATH,
     TEXT_ENC_ONNX_REL_PATH,
@@ -31,6 +31,7 @@ from .config import (
     VOICE_STYLES_DIR,
     get_model_cache_dir,
     get_model_repo,
+    get_model_revision,
 )
 from .core import Style, Supertonic, UnicodeProcessor
 from .utils import validate_voice_style_format
@@ -106,11 +107,13 @@ def download_model(model_dir: Union[Path, str], model_name: Optional[str] = None
     """
     model_dir = Path(model_dir) if isinstance(model_dir, str) else model_dir
 
-    # Determine which repo to download from
+    # Determine which repo and revision to download
+    effective_model = model_name or DEFAULT_MODEL
     if model_name is not None:
         repo_id = get_model_repo(model_name)
     else:
         repo_id = DEFAULT_MODEL_REPO
+    revision = get_model_revision(effective_model)
 
     # Use temporary directory for atomic download
     temp_dir = model_dir.parent / f".{model_dir.name}.tmp"
@@ -118,8 +121,10 @@ def download_model(model_dir: Union[Path, str], model_name: Optional[str] = None
     try:
         from huggingface_hub import snapshot_download
 
-        logger.info(f"Downloading model from {repo_id} to temporary location: {temp_dir}")
-        snapshot_download(repo_id=repo_id, local_dir=str(temp_dir), revision=DEFAULT_MODEL_REVISION)
+        logger.info(
+            f"Downloading model from {repo_id} @ {revision[:12]} to temporary location: {temp_dir}"
+        )
+        snapshot_download(repo_id=repo_id, local_dir=str(temp_dir), revision=revision)
 
         # Move from temporary to final location on success
         if model_dir.exists():

@@ -24,7 +24,7 @@ python test1_simple.py
 
 ### 2. Voice Styles (`test2_voices.py`)
 
-Test all available voice styles (M1, M2, F1, F2).
+Test all available voice styles (M1–M5, F1–F5 — 10 built-in voices).
 
 ```bash
 python test2_voices.py

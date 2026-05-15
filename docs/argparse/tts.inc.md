@@ -28,15 +28,13 @@ Path to custom voice style JSON file (overrides --voice if provided)
 
 Possible choices: `en`, `ko`, `ja`, `ar`, `bg`, `cs`, `da`, `de`, `el`, `es`, `et`, `fi`, `fr`, `hi`, `hr`, `hu`, `id`, `it`, `lt`, `lv`, `nl`, `pl`, `pt`, `ro`, `ru`, `sk`, `sl`, `sv`, `tr`, `uk`, `vi`, `na`
 
-Language code (supertonic-3): en, ko, ja, ar, bg, cs, da, de, el, es, et, fi, fr, hi, hr, hu, id, it, lt, lv, nl, pl, pt, ro, ru, sk, sl, sv, tr, uk, vi, or 'na' for unknown / unsupported languages. Default: en
-
-Default: `en`
+Language code (supertonic-3): en, ko, ja, ar, bg, cs, da, de, el, es, et, fi, fr, hi, hr, hu, id, it, lt, lv, nl, pl, pt, ro, ru, sk, sl, sv, tr, uk, vi, or 'na' for unknown / unsupported languages. Default: 'na' for multilingual models (supertonic-2/3), 'en' for supertonic v1.
 
 #### `--steps`
 
-Quality steps (default: 5, higher=better)
+Quality steps (default: 8, higher=better)
 
-Default: `5`
+Default: `8`
 
 #### `--speed`
 

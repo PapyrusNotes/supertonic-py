@@ -48,6 +48,7 @@ theme:
 hooks:
   - docs/hooks/generate_api_ref.py
   - docs/hooks/generate_cli_ref.py
+  - docs/hooks/copy_llmstxt.py
 
 plugins:
   - search

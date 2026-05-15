@@ -1,7 +1,7 @@
 """
 Example 2: Voice Styles
 
-Demonstrates using different voice styles (M1, M2, F1, F2).
+Demonstrates using different voice styles (M1–M5, F1–F5 — 10 built-in voices).
 """
 
 import os

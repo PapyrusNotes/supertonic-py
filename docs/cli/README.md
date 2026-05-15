@@ -9,9 +9,10 @@ supertonic tts TEXT -o OUTPUT.wav [OPTIONS]
 
 # Options:
 #   --model NAME              Model: supertonic, supertonic-2, supertonic-3 (default: supertonic-3)
-#   --voice STYLE             Voice style: M1, M2, F1, F2, ... (default: M1)
-#   --lang CODE               Language code (supertonic-3: 31 ISO codes + 'na'; default: en)
-#   --steps N                 Quality steps: 2-15 typical (default: 5)
+#   --voice STYLE             Voice style: M1–M5, F1–F5 (10 built-in; default: M1)
+#   --lang CODE               Language code (supertonic-3: 31 ISO codes + 'na';
+#                              default: 'na' for multilingual models, 'en' for v1)
+#   --steps N                 Quality steps: 5-12 typical (default: 8)
 #   --speed RATE              Speed multiplier: 0.7-2.0 (default: 1.05)
 #   --max-chunk-length N      Characters per chunk (default: 300)
 #   --silence-duration SECS   Silence between chunks (default: 0.3)
@@ -55,7 +56,7 @@ With options:
 # Specify voice style
 supertonic say 'Hello, welcome to the world!' --voice F1
 
-# Control quality (steps: 2-15 typical)
+# Control quality (steps: 5-12 typical, default 8)
 supertonic say 'Hello, welcome to the world!' --steps 10
 
 # Adjust speed (0.7-2.0)
@@ -80,7 +81,7 @@ With options:
 # Specify voice style
 supertonic tts 'Hello, welcome to the world!' -o output.wav --voice F1
 
-# Control quality (steps: 2-15 typical)
+# Control quality (steps: 5-12 typical, default 8)
 supertonic tts 'Hello, welcome to the world!' -o output.wav --steps 10
 
 # Adjust speed (0.7-2.0)
