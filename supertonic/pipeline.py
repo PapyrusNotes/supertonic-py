@@ -26,6 +26,7 @@ from .config import (
     MAX_TEXT_LENGTH,
     MAX_TOTAL_STEPS,
     MIN_TOTAL_STEPS,
+    UNKNOWN_LANGUAGE,
     is_multilingual_model,
 )
 from .core import Style
@@ -135,7 +136,8 @@ class TTS:
             `list_available_voice_style_names()`.
 
         Args:
-            voice_name: Name of the voice style (e.g., 'M1', 'F1', 'M2', 'F2')
+            voice_name: Name of the voice style. Supertonic-3 ships with
+                10 built-in voices: ``'M1'..'M5'`` and ``'F1'..'F5'``.
 
         Returns:
             Style object containing voice style vectors
@@ -161,7 +163,7 @@ class TTS:
         speed: float = DEFAULT_SPEED,
         max_chunk_length: Optional[int] = None,
         silence_duration: float = DEFAULT_SILENCE_DURATION,
-        lang: str = DEFAULT_LANGUAGE,
+        lang: Optional[str] = None,
         verbose: bool = False,
     ) -> tuple[np.ndarray, np.ndarray]:
         """Synthesize speech from text.
@@ -172,15 +174,17 @@ class TTS:
         Args:
             text: Text to synthesize
             voice_style: Voice style object
-            total_steps: Number of synthesis steps (default: 5)
+            total_steps: Number of synthesis steps (default: 8)
             speed: Speech speed multiplier (default: 1.05)
             max_chunk_length: Max characters per chunk. If None, automatically
                 determined based on language (300 for most, 120 for Korean)
             silence_duration: Silence between chunks in seconds (default: 0.3)
-            lang: Language code for synthesis (default: ``"en"``).
+            lang: Language code for synthesis. If ``None`` (default), the
+                code is resolved from the loaded model: ``"na"`` for
+                multilingual models (supertonic-2/3) so unknown text "just
+                works", and ``"en"`` for the English-only supertonic v1.
                 See ``AVAILABLE_LANGUAGES`` for the full list of codes
-                supported by the loaded model. Supertonic-3 accepts 31
-                ISO codes plus ``"na"`` as a fallback for unknown languages.
+                supported by the loaded model.
             verbose: If True, print detailed progress information (default: False)
 
         Returns:
@@ -200,6 +204,12 @@ class TTS:
         # Validate inputs
         if not text or not text.strip():
             raise ValueError("Text cannot be empty")
+
+        # Resolve default lang based on the loaded model:
+        #   - multilingual (supertonic-2/3) → "na" so unknown text just works
+        #   - English-only (supertonic v1)  → "en"
+        if lang is None:
+            lang = UNKNOWN_LANGUAGE if self.is_multilingual else DEFAULT_LANGUAGE
 
         # Validate language and handle non-multilingual models
         if self.is_multilingual:
@@ -359,7 +369,7 @@ class TTS:
         speed: float = DEFAULT_SPEED,
         max_chunk_length: Optional[int] = None,
         silence_duration: float = DEFAULT_SILENCE_DURATION,
-        lang: str = DEFAULT_LANGUAGE,
+        lang: Optional[str] = None,
         verbose: bool = False,
     ) -> tuple[np.ndarray, np.ndarray]:
         """Shorthand for synthesize(). Allows using tts(...) instead of tts.synthesize(...).
@@ -367,15 +377,16 @@ class TTS:
         Args:
             text: Text to synthesize
             voice_style: Voice style object
-            total_steps: Number of synthesis steps (default: 5)
+            total_steps: Number of synthesis steps (default: 8)
             speed: Speech speed multiplier (default: 1.05)
             max_chunk_length: Max characters per chunk. If None, automatically
                 determined based on language (300 for most, 120 for Korean)
             silence_duration: Silence between chunks in seconds (default: 0.3)
-            lang: Language code for synthesis (default: ``"en"``).
-                See ``AVAILABLE_LANGUAGES`` for codes supported by the
-                loaded model. Use ``"na"`` for unknown languages
-                (supertonic-3 only).
+            lang: Language code for synthesis. If ``None`` (default), the
+                code is resolved from the loaded model: ``"na"`` for
+                multilingual models (supertonic-2/3), ``"en"`` for the
+                English-only supertonic v1. See ``AVAILABLE_LANGUAGES``
+                for the full list.
             verbose: If True, print detailed progress information (default: False)
 
         Returns:

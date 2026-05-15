@@ -78,7 +78,7 @@ def cmd_say(args):
         print(f"   -> Voice style loaded in {style_time:.3f}s")
 
         # Generate speech
-        print(f"Generating speech (lang={args.lang})...")
+        print(f"Generating speech (lang={args.lang or 'auto'})...")
         start_time = time.time()
         wav, duration = tts.synthesize(
             args.text,
@@ -157,7 +157,7 @@ def cmd_tts(args):
         print(f"   -> Voice style loaded in {style_time:.3f}s")
 
         # Generate speech
-        print(f"Generating speech (lang={args.lang})...")
+        print(f"Generating speech (lang={args.lang or 'auto'})...")
         start_time = time.time()
         wav, duration = tts.synthesize(
             args.text,
@@ -312,7 +312,7 @@ Examples:
     parser_say.add_argument(
         "--lang",
         type=str,
-        default=DEFAULT_LANGUAGE,
+        default=None,
         choices=AVAILABLE_LANGUAGES,
         metavar="LANG",
         help=(
@@ -320,11 +320,12 @@ Examples:
             "en, ko, ja, ar, bg, cs, da, de, el, es, et, fi, fr, hi, hr, hu, "
             "id, it, lt, lv, nl, pl, pt, ro, ru, sk, sl, sv, tr, uk, vi, "
             "or 'na' for unknown / unsupported languages. "
-            f"Default: {DEFAULT_LANGUAGE}"
+            "Default: 'na' for multilingual models (supertonic-2/3), "
+            "'en' for supertonic v1."
         ),
     )
     parser_say.add_argument(
-        "--steps", type=int, default=5, help="Quality steps (default: 5, higher=better)"
+        "--steps", type=int, default=8, help="Quality steps (default: 8, higher=better)"
     )
     parser_say.add_argument(
         "--speed",
@@ -371,7 +372,7 @@ Examples:
     parser_tts.add_argument(
         "--lang",
         type=str,
-        default=DEFAULT_LANGUAGE,
+        default=None,
         choices=AVAILABLE_LANGUAGES,
         metavar="LANG",
         help=(
@@ -379,11 +380,12 @@ Examples:
             "en, ko, ja, ar, bg, cs, da, de, el, es, et, fi, fr, hi, hr, hu, "
             "id, it, lt, lv, nl, pl, pt, ro, ru, sk, sl, sv, tr, uk, vi, "
             "or 'na' for unknown / unsupported languages. "
-            f"Default: {DEFAULT_LANGUAGE}"
+            "Default: 'na' for multilingual models (supertonic-2/3), "
+            "'en' for supertonic v1."
         ),
     )
     parser_tts.add_argument(
-        "--steps", type=int, default=5, help="Quality steps (default: 5, higher=better)"
+        "--steps", type=int, default=8, help="Quality steps (default: 8, higher=better)"
     )
     parser_tts.add_argument(
         "--speed",
@@ -414,7 +416,7 @@ Examples:
     parser_synth.add_argument("-o", "--output", required=True, help="Output WAV file")
     parser_synth.add_argument("--voice", default="M1", help="Voice style (default: M1)")
     parser_synth.add_argument(
-        "--steps", type=int, default=5, help="Quality steps (default: 5, higher=better)"
+        "--steps", type=int, default=8, help="Quality steps (default: 8, higher=better)"
     )
     add_common_args(parser_synth)
     parser_synth.set_defaults(func=cmd_tts)

@@ -17,16 +17,17 @@ Example:
     from supertonic import TTS
 
     tts = TTS()
-    style = tts.get_voice_style("M1")
+    style = tts.get_voice_style("M1")  # 10 built-in voices: M1–M5, F1–F5
 
-    # English (default)
+    # English — pass an ISO code to opt into language-specific handling
     wav, duration = tts.synthesize("Welcome to Supertonic!", voice_style=style, lang="en")
 
     # Korean
     wav_ko, _ = tts.synthesize("안녕하세요!", voice_style=style, lang="ko")
 
-    # Unknown language fallback
-    wav_na, _ = tts.synthesize("Some text", voice_style=style, lang="na")
+    # Default: `lang=None` resolves to the "na" fallback for Supertonic-3,
+    # so unknown text just works without picking a code.
+    wav_na, _ = tts.synthesize("Some text", voice_style=style)
 
     tts.save_audio(wav, "output.wav")
     ```
@@ -47,7 +48,7 @@ from .config import (
 from .core import Style, UnicodeProcessor
 from .pipeline import TTS
 
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 
 __all__ = [
     "TTS",

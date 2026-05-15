@@ -15,22 +15,32 @@ logger = logging.getLogger(__name__)
 AVAILABLE_MODELS = ["supertonic", "supertonic-2", "supertonic-3"]
 DEFAULT_MODEL = "supertonic-3"
 
-# Model configuration mapping
+# Model configuration mapping.
+#
+# `revision` pins the HuggingFace Hub commit each Supertonic release was
+# tested against. Pinning by SHA (instead of `"main"`) keeps a `pip install`
+# of a given package version reproducible even if the HF repo later
+# changes. To upgrade the model, bump the SHA here and ship a new package
+# release. Power users can still override with the
+# `SUPERTONIC_MODEL_REVISION` environment variable.
 MODEL_CONFIGS = {
     "supertonic": {
         "repo": "Supertone/supertonic",
         "cache_dir": "supertonic",
         "multilingual": False,
+        "revision": "b6856d033f622c63ea29441795be266a1133e227",
     },
     "supertonic-2": {
         "repo": "Supertone/supertonic-2",
         "cache_dir": "supertonic2",
         "multilingual": True,
+        "revision": "75e6727618a02f323c720cba9478152d4bc16ca4",
     },
     "supertonic-3": {
         "repo": "Supertone/supertonic-3",
         "cache_dir": "supertonic3",
         "multilingual": True,
+        "revision": "724fb5abbf5502583fb520898d45929e62f02c0b",
     },
 }
 
@@ -39,7 +49,10 @@ DEFAULT_MODEL_REPO = os.getenv("SUPERTONIC_MODEL_REPO", MODEL_CONFIGS[DEFAULT_MO
 DEFAULT_CACHE_DIR = os.getenv(
     "SUPERTONIC_CACHE_DIR", str(Path.home() / ".cache" / MODEL_CONFIGS[DEFAULT_MODEL]["cache_dir"])
 )
-DEFAULT_MODEL_REVISION = os.getenv("SUPERTONIC_MODEL_REVISION", "main")
+# Optional revision override. When unset (the common case), each model is
+# downloaded at its pinned SHA from `MODEL_CONFIGS`. When set, the override
+# applies to every model — primarily a debugging / development knob.
+MODEL_REVISION_ENV_OVERRIDE = os.getenv("SUPERTONIC_MODEL_REVISION")
 
 
 def get_model_config(model_name: str) -> dict:
@@ -85,6 +98,24 @@ def get_model_repo(model_name: str) -> str:
     """
     config = get_model_config(model_name)
     return config["repo"]
+
+
+def get_model_revision(model_name: str) -> str:
+    """Get the HuggingFace Hub revision to download for a model.
+
+    Priority: ``SUPERTONIC_MODEL_REVISION`` env var (if set) → the
+    per-model pinned SHA in ``MODEL_CONFIGS``. Pinning by SHA keeps a
+    given package version reproducible across HF Hub updates.
+
+    Args:
+        model_name: Model name (one of ``AVAILABLE_MODELS``)
+
+    Returns:
+        Commit SHA (or whatever ref the env override points at).
+    """
+    if MODEL_REVISION_ENV_OVERRIDE:
+        return MODEL_REVISION_ENV_OVERRIDE
+    return get_model_config(model_name)["revision"]
 
 
 def is_multilingual_model(model_name: str) -> bool:
@@ -156,7 +187,7 @@ AVAILABLE_LANGUAGES = SUPPORTED_LANGUAGES + [UNKNOWN_LANGUAGE]
 DEFAULT_LANGUAGE = "en"
 
 # TTS parameters - defaults
-DEFAULT_TOTAL_STEPS = 5
+DEFAULT_TOTAL_STEPS = 8
 DEFAULT_SPEED = 1.05
 DEFAULT_MAX_CHUNK_LENGTH = 300
 DEFAULT_MAX_CHUNK_LENGTH_KO = 120  # Korean requires shorter chunks
