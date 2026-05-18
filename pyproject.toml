@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "supertonic"
-version = "1.3.0"
+version = "1.3.1"
 description = "High-quality Text-to-Speech synthesis with ONNX Runtime"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -42,6 +42,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Multimedia :: Sound/Audio :: Speech",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -49,7 +50,11 @@ classifiers = [
 ]
 
 dependencies = [
-    "onnxruntime>=1.19.0",
+    # onnxruntime 1.20.0 is the first release with a Python 3.13 wheel — anything
+    # lower forces source builds on 3.13 environments. (1.19.0 was the floor we
+    # raised to in 1.2.3 for numpy 2.x C-ABI compatibility; this bump keeps that
+    # invariant and adds 3.13 wheel availability.)
+    "onnxruntime>=1.20.0",
     "numpy>=1.21.0",
     "soundfile>=0.10.0",
     "huggingface-hub>=0.10.0",
@@ -99,7 +104,10 @@ version = {attr = "supertonic.__version__"}
 
 [tool.black]
 line-length = 100
-target-version = ["py39", "py310", "py311", "py312"]
+# Match the CI lint job's Python (3.11). Adding py312 here makes black emit
+# 3.12-only formatting that the 3.11 lint job cannot AST-parse, producing a
+# noisy warning on every run.
+target-version = ["py39", "py310", "py311"]
 
 [tool.ruff]
 line-length = 100

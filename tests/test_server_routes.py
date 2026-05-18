@@ -9,7 +9,6 @@ error envelope.
 from __future__ import annotations
 
 import base64
-import io
 import json
 from pathlib import Path
 
@@ -109,6 +108,7 @@ def client(fake_state):
 # /v1/health
 # ---------------------------------------------------------------------------
 
+
 def test_health_ok(client):
     r = client.get("/v1/health")
     assert r.status_code == 200
@@ -122,6 +122,7 @@ def test_health_ok(client):
 # ---------------------------------------------------------------------------
 # /v1/styles + /v1/styles/import
 # ---------------------------------------------------------------------------
+
 
 def test_list_styles_lists_builtins(client):
     r = client.get("/v1/styles")
@@ -229,6 +230,7 @@ def test_invalid_content_length_header(client):
 # /v1/tts
 # ---------------------------------------------------------------------------
 
+
 def test_tts_returns_wav_bytes(client, fake_state):
     _, fake = fake_state
     r = client.post("/v1/tts", json={"text": "hello", "voice": "M1", "lang": "en"})
@@ -290,6 +292,7 @@ def test_tts_custom_voice_after_import(client, fake_state):
 # /v1/audio/speech (OpenAI compat alias)
 # ---------------------------------------------------------------------------
 
+
 def test_openai_compat_default_wav(client, fake_state):
     _, fake = fake_state
     r = client.post(
@@ -343,6 +346,7 @@ def test_openai_compat_unknown_model(client):
 # /v1/tts/batch
 # ---------------------------------------------------------------------------
 
+
 def test_batch_two_items(client, fake_state):
     _, fake = fake_state
     payload = {
@@ -387,6 +391,7 @@ def test_batch_item_unknown_voice(client):
 # FastAPI returns its default 422 body, which is acceptable for now).
 # ---------------------------------------------------------------------------
 
+
 def test_tts_empty_text_is_422(client):
     r = client.post("/v1/tts", json={"text": "", "voice": "M1"})
     # pydantic min_length=1 produces a 422 from FastAPI's default validator.
@@ -398,11 +403,13 @@ def test_tts_empty_text_is_422(client):
 # cannot collide across model versions.
 # ---------------------------------------------------------------------------
 
+
 def test_default_custom_styles_dir_is_per_model(monkeypatch):
     from supertonic.server import styles_store
 
     # Make sure no user-level override leaks in.
     monkeypatch.delenv("SUPERTONIC_CUSTOM_STYLES_DIR", raising=False)
+    monkeypatch.delenv("SUPERTONIC_CACHE_DIR", raising=False)
 
     d3 = styles_store.default_custom_styles_dir("supertonic-3")
     d2 = styles_store.default_custom_styles_dir("supertonic-2")
@@ -424,3 +431,22 @@ def test_env_override_wins_over_model_scope(monkeypatch, tmp_path):
         == tmp_path / "shared"
         == styles_store.default_custom_styles_dir("supertonic-2")
     )
+
+
+def test_default_custom_styles_dir_inherits_cache_dir_env_var(monkeypatch, tmp_path):
+    """``SUPERTONIC_CACHE_DIR`` propagates through to the server's custom-style
+    directory: ``<env>/custom_styles``.
+
+    Verifies that the 1.3.1 fix to :func:`supertonic.config.get_model_cache_dir`
+    transitively repairs ``default_custom_styles_dir`` without any change to
+    the server package itself.
+    """
+    from supertonic.server import styles_store
+
+    # SUPERTONIC_CUSTOM_STYLES_DIR is a stronger override and would mask the
+    # behavior under test; explicitly clear it.
+    monkeypatch.delenv("SUPERTONIC_CUSTOM_STYLES_DIR", raising=False)
+    monkeypatch.setenv("SUPERTONIC_CACHE_DIR", str(tmp_path))
+
+    assert styles_store.default_custom_styles_dir("supertonic-3") == tmp_path / "custom_styles"
+    assert styles_store.default_custom_styles_dir("supertonic-2") == tmp_path / "custom_styles"

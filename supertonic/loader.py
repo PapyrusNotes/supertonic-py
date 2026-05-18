@@ -17,7 +17,6 @@ import onnxruntime as ort  # type: ignore[import-untyped]
 
 from .config import (
     CFG_REL_PATH,
-    DEFAULT_CACHE_DIR,
     DEFAULT_INTER_OP_NUM_THREADS,
     DEFAULT_INTRA_OP_NUM_THREADS,
     DEFAULT_MODEL,
@@ -53,11 +52,10 @@ def get_cache_dir(model_name: Optional[str] = None) -> Path:
         Default location depends on the loaded model
         (e.g., ``~/.cache/supertonic3`` for supertonic-3), but can be
         overridden with the ``SUPERTONIC_CACHE_DIR`` environment variable.
+        The override is resolved on every call (not snapshotted at import),
+        so late-set env vars are honored.
     """
-    if model_name is not None:
-        cache_dir = get_model_cache_dir(model_name)
-    else:
-        cache_dir = Path(DEFAULT_CACHE_DIR)
+    cache_dir = get_model_cache_dir(model_name or DEFAULT_MODEL)
     cache_dir.mkdir(parents=True, exist_ok=True)
     logger.debug(f"Using cache directory: {cache_dir}")
     return cache_dir
