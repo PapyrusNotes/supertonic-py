@@ -8,6 +8,39 @@ This project broadly follows [Semantic Versioning](https://semver.org/spec/v2.0.
 shifts in `total_steps` and `lang` that are semver-minor in nature but are
 shipping under a patch bump on purpose.**
 
+## [1.3.1] — 2026-05-18
+
+### Added
+- **Python 3.13 is officially supported.** The CI matrix runs against 3.9
+  through 3.13 on Ubuntu/macOS/Windows; 3.14 enters the matrix as
+  *experimental* (best-effort, `continue-on-error`, `allow-prereleases`)
+  and will be promoted once all native dependencies (notably
+  `onnxruntime`, `uvloop`) ship 3.14 wheels.
+
+### Changed
+- Raise the `onnxruntime` floor to `>=1.20.0`. 1.20.0 is the first release
+  with a Python 3.13 wheel — older floors force a source build (and
+  almost-certain failure) on 3.13 environments. This preserves the
+  numpy 2.x C-ABI compatibility that motivated the 1.19.0 floor in 1.2.3.
+- CI test job now installs `pip install -e ".[dev,serve]"`. Previously
+  only `[dev]` was installed, so `tests/test_server_routes.py` was
+  skipped via `pytest.importorskip("fastapi")` and the new server code
+  shipped without a real CI gate. The full server test suite now runs
+  across every matrix cell.
+- `[tool.black].target-version` narrowed to `py39…py311` to match the
+  lint job's Python (3.11). Including `py312` produced a noisy "Python
+  3.11 cannot parse code formatted for Python 3.12" warning on every CI
+  run without changing any actual formatting.
+
+### Fixed
+- Apply Black formatting to `supertonic/server/{routes,styles_store}.py`
+  and `tests/test_server_routes.py` (whitespace + ternary parenthesization
+  drift; no behavior change).
+- Drop unused imports (`sys` in `tests/test_cli_serve.py`, `io` in
+  `tests/test_server_routes.py`) flagged by Ruff.
+- Remove the unused `styles_store.resolve()` helper and its trailing
+  `Optional` import (dead code from the initial server cut).
+
 ## [1.3.0] — 2026-05-18
 
 ### Added

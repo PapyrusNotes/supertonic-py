@@ -69,9 +69,7 @@ class StyleNameConflict(ValueError):
 def sanitize_name(name: str) -> str:
     name = (name or "").strip()
     if not _NAME_RE.fullmatch(name):
-        raise InvalidStyleName(
-            f"Invalid style name {name!r}: must match [A-Za-z0-9_-]{{1,64}}"
-        )
+        raise InvalidStyleName(f"Invalid style name {name!r}: must match [A-Za-z0-9_-]{{1,64}}")
     return name
 
 
@@ -120,9 +118,7 @@ def save(
     """
     name = sanitize_name(name)
     if name in set(builtin_names):
-        raise StyleNameConflict(
-            f"Name {name!r} is a built-in voice and cannot be overwritten"
-        )
+        raise StyleNameConflict(f"Name {name!r} is a built-in voice and cannot be overwritten")
     if not validate_voice_style_format(payload):
         # Re-using the SDK error type so server handlers can map uniformly.
         raise ValueError("voice style JSON is missing required keys/fields")
@@ -136,5 +132,3 @@ def save(
         json.dump(payload, f)
     tmp.replace(target)
     return target
-
-

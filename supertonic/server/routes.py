@@ -366,11 +366,15 @@ def register_routes(app: FastAPI) -> None:
             lang = item.lang or (defaults.lang if defaults else None)
             speed = item.speed if item.speed is not None else (defaults.speed if defaults else None)
             steps = item.steps if item.steps is not None else (defaults.steps if defaults else None)
-            mcl = item.max_chunk_length if item.max_chunk_length is not None else (
-                defaults.max_chunk_length if defaults else None
+            mcl = (
+                item.max_chunk_length
+                if item.max_chunk_length is not None
+                else (defaults.max_chunk_length if defaults else None)
             )
-            sil = item.silence_duration if item.silence_duration is not None else (
-                defaults.silence_duration if defaults else None
+            sil = (
+                item.silence_duration
+                if item.silence_duration is not None
+                else (defaults.silence_duration if defaults else None)
             )
             if lang is not None and lang not in AVAILABLE_LANGUAGES:
                 return _error(

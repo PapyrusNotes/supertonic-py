@@ -6,7 +6,6 @@ missing. They never start a real server (uvicorn.run is monkeypatched).
 
 from __future__ import annotations
 
-import sys
 from argparse import Namespace
 
 import pytest
