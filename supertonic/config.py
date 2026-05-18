@@ -46,9 +46,11 @@ MODEL_CONFIGS = {
 
 # Default model settings (can be overridden by environment variables)
 DEFAULT_MODEL_REPO = os.getenv("SUPERTONIC_MODEL_REPO", MODEL_CONFIGS[DEFAULT_MODEL]["repo"])
-DEFAULT_CACHE_DIR = os.getenv(
-    "SUPERTONIC_CACHE_DIR", str(Path.home() / ".cache" / MODEL_CONFIGS[DEFAULT_MODEL]["cache_dir"])
-)
+# ``SUPERTONIC_CACHE_DIR`` is intentionally not snapshotted to a module-level
+# constant here — it is consulted at call time inside
+# :func:`get_model_cache_dir` so the override is honored on every code path
+# (notably ``TTS(model="…")``, the default and most common entry) and
+# late-set env vars (test fixtures, late configuration) take effect.
 # Optional revision override. When unset (the common case), each model is
 # downloaded at its pinned SHA from `MODEL_CONFIGS`. When set, the override
 # applies to every model — primarily a debugging / development knob.
@@ -77,12 +79,21 @@ def get_model_config(model_name: str) -> dict:
 def get_model_cache_dir(model_name: str) -> Path:
     """Get cache directory for a specific model.
 
+    ``$SUPERTONIC_CACHE_DIR`` overrides the directory for *every* model when
+    set — matching the documented contract and the historical
+    ``DEFAULT_CACHE_DIR`` spelling. Users running two models from the same
+    process and wanting them separated should leave the env var unset (each
+    model then falls back to its own ``~/.cache/<cache_dir>``).
+
     Args:
         model_name: Model name (one of ``AVAILABLE_MODELS``)
 
     Returns:
         Path to the model's cache directory
     """
+    env = os.environ.get("SUPERTONIC_CACHE_DIR")
+    if env:
+        return Path(env).expanduser()
     config = get_model_config(model_name)
     return Path.home() / ".cache" / config["cache_dir"]
 

@@ -40,6 +40,15 @@ shipping under a patch bump on purpose.**
   `tests/test_server_routes.py`) flagged by Ruff.
 - Remove the unused `styles_store.resolve()` helper and its trailing
   `Optional` import (dead code from the initial server cut).
+- **`SUPERTONIC_CACHE_DIR` env var now overrides the cache directory on
+  every code path.** Previously it was silently ignored on the most common
+  call shape — `TTS()` constructed with a model name (the default, since
+  `model: str = "supertonic-3"`). `get_model_cache_dir()` now consults the
+  env var at call time, and `get_cache_dir()` no longer has a two-branch
+  fork. The same fix transitively repairs `default_custom_styles_dir()`
+  in the server package. Resolution is **lazy** (call-time) instead of
+  eager (import-time), so late-set env vars are honored. Tests cover the
+  reproduction from the original bug report plus a lazy-evaluation guard.
 
 ## [1.3.0] — 2026-05-18
 

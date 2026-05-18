@@ -409,6 +409,7 @@ def test_default_custom_styles_dir_is_per_model(monkeypatch):
 
     # Make sure no user-level override leaks in.
     monkeypatch.delenv("SUPERTONIC_CUSTOM_STYLES_DIR", raising=False)
+    monkeypatch.delenv("SUPERTONIC_CACHE_DIR", raising=False)
 
     d3 = styles_store.default_custom_styles_dir("supertonic-3")
     d2 = styles_store.default_custom_styles_dir("supertonic-2")
@@ -430,3 +431,22 @@ def test_env_override_wins_over_model_scope(monkeypatch, tmp_path):
         == tmp_path / "shared"
         == styles_store.default_custom_styles_dir("supertonic-2")
     )
+
+
+def test_default_custom_styles_dir_inherits_cache_dir_env_var(monkeypatch, tmp_path):
+    """``SUPERTONIC_CACHE_DIR`` propagates through to the server's custom-style
+    directory: ``<env>/custom_styles``.
+
+    Verifies that the 1.3.1 fix to :func:`supertonic.config.get_model_cache_dir`
+    transitively repairs ``default_custom_styles_dir`` without any change to
+    the server package itself.
+    """
+    from supertonic.server import styles_store
+
+    # SUPERTONIC_CUSTOM_STYLES_DIR is a stronger override and would mask the
+    # behavior under test; explicitly clear it.
+    monkeypatch.delenv("SUPERTONIC_CUSTOM_STYLES_DIR", raising=False)
+    monkeypatch.setenv("SUPERTONIC_CACHE_DIR", str(tmp_path))
+
+    assert styles_store.default_custom_styles_dir("supertonic-3") == tmp_path / "custom_styles"
+    assert styles_store.default_custom_styles_dir("supertonic-2") == tmp_path / "custom_styles"
