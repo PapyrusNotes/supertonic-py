@@ -168,6 +168,7 @@ nav:
       - utils: api/utils.md
       - config: api/config.md
       - cli: api/cli.md
+      - server: api/server.md
     - CLI Reference:
         - Overview: cli/README.md
         - supertonic say: cli/say.md
@@ -176,3 +177,4 @@ nav:
         - supertonic info: cli/info.md
         - supertonic download: cli/download.md
         - supertonic version: cli/version.md
+        - supertonic serve: cli/serve.md

@@ -232,6 +232,52 @@ def cmd_version(args):
     print(f"supertonic {__version__}")
 
 
+def cmd_serve(args):
+    """Run a local HTTP server exposing /v1/tts and friends."""
+    if args.verbose:
+        logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    else:
+        logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
+
+    try:
+        import uvicorn
+
+        from .server import create_app
+    except ImportError:
+        print("❌ Error: fastapi and uvicorn are required for the 'serve' command.")
+        print("   Install them with: pip install supertonic[serve]")
+        sys.exit(1)
+
+    if args.host not in ("127.0.0.1", "localhost", "::1"):
+        # Bind to anything other than loopback is opt-in. Print a one-line
+        # warning so an accidental ``--host 0.0.0.0`` is visible.
+        print(
+            f"⚠️  Warning: binding to {args.host} exposes the server beyond loopback. "
+            "Add auth at a reverse proxy if this is intentional.",
+            file=sys.stderr,
+        )
+
+    cors_origins = None
+    if args.cors:
+        cors_origins = [o.strip() for o in args.cors.split(",") if o.strip()]
+
+    app = create_app(model=args.model, cors_origins=cors_origins)
+
+    print(f"supertonic serve listening on http://{args.host}:{args.port}")
+    print(f"  docs:  http://{args.host}:{args.port}/docs")
+    print(f"  model: {args.model}")
+
+    uvicorn.run(
+        app,
+        host=args.host,
+        port=args.port,
+        log_level=args.log_level,
+        # uvicorn's reload mode requires an import string, not an app instance.
+        # We don't support it here — power users can run uvicorn directly
+        # against ``supertonic.server:create_app`` if they want reload.
+    )
+
+
 def create_parser() -> argparse.ArgumentParser:
     """Create and return the CLI argument parser.
 
@@ -442,6 +488,46 @@ Examples:
         "version", aliases=["v"], help="Show version information"
     )
     parser_version.set_defaults(func=cmd_version)
+
+    # Serve command — local HTTP wrapper. Installed via ``pip install supertonic[serve]``.
+    parser_serve = subparsers.add_parser(
+        "serve",
+        help="Run a local HTTP server exposing /v1/tts (and OpenAI-compatible /v1/audio/speech)",
+    )
+    parser_serve.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Interface to bind (default: 127.0.0.1; loopback only)",
+    )
+    parser_serve.add_argument(
+        "--port", type=int, default=7788, help="Port to listen on (default: 7788)"
+    )
+    parser_serve.add_argument(
+        "--model",
+        type=str,
+        default=DEFAULT_MODEL,
+        choices=AVAILABLE_MODELS,
+        help=f"Model to load on startup (default: {DEFAULT_MODEL})",
+    )
+    parser_serve.add_argument(
+        "--cors",
+        type=str,
+        default=None,
+        help=(
+            "Comma-separated CORS origins to allow (e.g. "
+            "'http://localhost:*,chrome-extension://*'). "
+            "Omit to disable CORS entirely."
+        ),
+    )
+    parser_serve.add_argument(
+        "--log-level",
+        type=str,
+        default="info",
+        choices=["critical", "error", "warning", "info", "debug", "trace"],
+        help="uvicorn log level (default: info)",
+    )
+    add_common_args(parser_serve)
+    parser_serve.set_defaults(func=cmd_serve)
 
     return parser
 

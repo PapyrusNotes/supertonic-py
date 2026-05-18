@@ -89,6 +89,26 @@ supertonic tts 'La reunión comienza pronto y todos se sientan en silencio para 
 supertonic tts 'A reunião começa em breve e todos se sentam em silêncio para ouvir.' -o portuguese.wav --lang pt
 ```
 
+### Local HTTP server
+
+Run Supertonic as a thin local HTTP wrapper for n8n, browser extensions,
+Electron apps, Unity, Home Assistant, or anything that already speaks the
+OpenAI Audio Speech API:
+
+```bash
+pip install 'supertonic[serve]'
+supertonic serve --host 127.0.0.1 --port 7788
+
+# Native endpoint
+curl -X POST http://127.0.0.1:7788/v1/tts \
+  -H 'content-type: application/json' \
+  -d '{"text":"Supertonic is a lightning fast, on-device TTS system.","voice":"M1","lang":"en"}' \
+  -o output.wav
+```
+
+See **[Local Server](quickstart.md#local-server)** for the OpenAI-compatible
+alias, Voice Builder custom-voice import, and the batch endpoint.
+
 [Get Started with the Full Guide](quickstart.md){ .md-button .md-button--primary }
 
 Explore installation options, voice customization, and advanced configuration.
@@ -102,21 +122,21 @@ Supertonic has **minimal dependencies** - just 4 core libraries:
 - **soundfile** - Audio file I/O
 - **huggingface-hub** - Model downloads
 
-## Key Features
+## ✨ Highlights
 
-**⚡ Blazingly Fast**: Generates speech up to **167× faster than real-time** on consumer hardware (M4 Pro)
+**⚡ Blazingly Fast** — Low-latency, real-time synthesis across desktop, browser, mobile, and edge — fast enough to turn an entire webpage into audio in under a second
 
-**🪶 Ultra Lightweight**: Only **66M parameters**, optimized for efficient on-device performance
+**🌍 31-Language Multilingual** — Synthesize directly from text across 31 languages, or pass `lang="na"` to let Supertonic process the text language-agnostically when you don't know the input language — no separate language adapters needed
 
-**📱 On-Device Capable**: **Complete privacy** and **zero latency**
+**🪶 99M-Parameter Open-Weight Model** — A compact, fully open-weight checkpoint — a fraction of the size of 0.7B–2B class open TTS systems — for smaller downloads, faster cold starts, and lower memory footprint
 
-**🌐 Multilingual (v3)**: Supports **31 languages** plus a `na` fallback for unknown languages
+**📱 Edge-Device Ready** — Runs locally on desktop, mobile, browsers, and resource-constrained hardware like Raspberry Pi or e-readers, with zero network dependency, complete privacy, and no GPU required
 
-**🎨 Natural Text Handling**: Seamlessly processes complex expressions without G2P module
+**🔊 44.1kHz High-Quality Audio** — Outputs studio-grade 44.1kHz 16-bit WAV directly, ready for production playback without any external upsampler
 
-**⚙️ Highly Configurable**: Adjust inference steps, speech speed, and other parameters
+**🎭 Expression Tags** — 10 inline tags (e.g. `<laugh>`, `<breath>`, `<sigh>`) bring natural human nuance into generated speech without prompt engineering or reference audio
 
-**🧩 Flexible Deployment**: Deploy across servers, browsers, and edge devices
+**🛠️ Multi-Runtime SDKs** — Ready-to-use examples through ONNX Runtime across Python, Node.js, Browser (WebGPU), Java, C++, C#, Go, Swift, iOS, Rust, and Flutter
 
 ## Supported Languages
 

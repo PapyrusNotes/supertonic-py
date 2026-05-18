@@ -8,6 +8,66 @@ This project broadly follows [Semantic Versioning](https://semver.org/spec/v2.0.
 shifts in `total_steps` and `lang` that are semver-minor in nature but are
 shipping under a patch bump on purpose.**
 
+## [1.3.0] — 2026-05-18
+
+### Added
+- **`supertonic serve` — local HTTP server.** A thin, loopback-only FastAPI
+  wrapper around the same TTS engine, installed via the new `[serve]`
+  extra (`pip install supertonic[serve]`). Designed for environments where
+  embedding a Python interpreter is awkward — n8n, browser extensions,
+  Electron apps, Unity, Home Assistant, robotics devices — and for clients
+  that already speak the OpenAI Audio Speech API.
+
+  Endpoints:
+  - `GET  /v1/health` — readiness + loaded model info
+  - `GET  /v1/styles` — built-in + imported custom voices
+  - `POST /v1/styles/import` — multipart or JSON upload of a Voice Builder
+    style JSON; persisted per-model under
+    `~/.cache/<model>/custom_styles/`
+  - `POST /v1/tts` — native synthesis (full parameter set)
+  - `POST /v1/audio/speech` — OpenAI Audio Speech-compatible alias
+  - `POST /v1/tts/batch` — up to 64 items in a single JSON request,
+    base64-encoded audio response
+
+  Defaults: bind `127.0.0.1:7788`, no auth, no CORS, single uvicorn worker.
+  Binding beyond loopback is opt-in and emits a stderr warning. Errors use
+  the OpenAI-shaped `{"error":{"message","type","code"}}` envelope so
+  existing OpenAI-SDK error parsers keep working.
+
+- **`supertonic.server` Python package.** `create_app()` and `ServerState`
+  are exposed for users who want to mount the FastAPI app inside a larger
+  ASGI service (e.g. behind a reverse proxy with auth).
+
+- **Per-model custom-voice storage.** Imported voice JSONs are stored
+  under `<model cache dir>/custom_styles/` (e.g.
+  `~/.cache/supertonic3/custom_styles/`) so the same name cannot collide
+  across model versions. `$SUPERTONIC_CUSTOM_STYLES_DIR` overrides this
+  with a single shared directory.
+
+- **`Content-Length` pre-flight middleware** for `POST /v1/styles/import`.
+  Requests exceeding 1 MiB are rejected at the headers stage before the
+  body is buffered.
+
+- **Docs + CLI reference for `supertonic serve`** — `docs/cli/serve.md`,
+  `docs/api/server.md`, a new *Local Server* section in `docs/quickstart.md`,
+  and a *Local Server (HTTP)* section in `README.md`.
+
+### Changed
+- README *Key Features* section renamed and refreshed as *✨ Highlights*
+  with Supertonic-3 facts (99M-parameter open-weight model, 31-language
+  multilingual, 44.1 kHz native output, Expression Tags, multi-runtime
+  SDKs). The same update lands in `docs/index.md`.
+
+### Notes
+- `supertonic serve` ships with no MP3, AAC, or Opus encoding. Supported
+  `response_format` values are `wav`, `flac`, and `ogg` (Vorbis) —
+  everything libsndfile encodes natively at 44.1 kHz. MP3/AAC would add
+  encoder dependencies; Opus needs an 8/12/16/24/48 kHz resampling step
+  and is deferred.
+- The existing SDK and CLI (`say`, `tts`, `list-voices`, `info`,
+  `download`, `version`) are untouched. Core dependencies are unchanged —
+  FastAPI/uvicorn install only when the `[serve]` extra is requested.
+
 ## [1.2.3] — 2026-05-15
 
 ### Fixed

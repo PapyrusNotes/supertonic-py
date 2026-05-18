@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "supertonic"
-version = "1.2.3"
+version = "1.3.0"
 description = "High-quality Text-to-Speech synthesis with ONNX Runtime"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -27,6 +27,10 @@ keywords = [
     "voice-synthesis",
     "neural-tts",
     "on-device",
+    "tts-server",
+    "http-server",
+    "fastapi",
+    "openai-compatible",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -55,6 +59,12 @@ dependencies = [
 playback = [
     "sounddevice>=0.4.0",
 ]
+serve = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "pydantic>=2.5",
+    "python-multipart>=0.0.9",
+]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.1.0",
@@ -62,6 +72,7 @@ dev = [
     "ruff>=0.1.0",
     "build>=1.0.0",
     "twine>=4.0.0",
+    "httpx>=0.27",
 ]
 
 [project.urls]

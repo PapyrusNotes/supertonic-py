@@ -96,6 +96,161 @@ supertonic tts 'La reunión comienza pronto y todos se sientan en silencio para 
 supertonic tts 'A reunião começa em breve e todos se sentam em silêncio para ouvir.' -o portuguese.wav --lang pt
 ```
 
+## Local Server (HTTP)
+
+`supertonic serve` runs a thin local HTTP wrapper around the same engine. It
+makes Supertonic easy to call from environments where embedding a Python
+interpreter is awkward — n8n, browser extensions, Electron apps, Unity, Home
+Assistant, robotics devices, or anything that already speaks the OpenAI Audio
+Speech API.
+
+### Install and run
+
+```bash
+pip install 'supertonic[serve]'                    # adds fastapi + uvicorn
+supertonic serve --host 127.0.0.1 --port 7788      # defaults; loopback only
+```
+
+The first run downloads the model (~400MB) just like the SDK. Once it's up:
+
+- Synthesis endpoint: `http://127.0.0.1:7788/v1/tts`
+- OpenAI-compatible alias: `http://127.0.0.1:7788/v1/audio/speech`
+- Interactive OpenAPI docs: `http://127.0.0.1:7788/docs`
+
+`--host` defaults to `127.0.0.1`. Binding to any other interface is opt-in
+and prints a one-line warning — put it behind a reverse proxy if you do.
+
+### Generate audio (two ways)
+
+**Native `/v1/tts`** — full Supertonic parameter set:
+
+```bash
+curl -X POST http://127.0.0.1:7788/v1/tts \
+  -H 'content-type: application/json' \
+  -d '{
+        "text": "Supertonic is a lightning fast, on-device TTS system.",
+        "voice": "M1",
+        "lang": "en",
+        "steps": 8,
+        "speed": 1.05,
+        "response_format": "wav"
+      }' \
+  -o output.wav
+```
+
+Response is the audio bytes (`audio/wav` by default). Useful headers:
+`X-Audio-Duration` (seconds), `X-Sample-Rate`, and `X-Supertonic-Version`.
+Supported `response_format` values: `wav`, `flac`, `ogg` (Vorbis).
+
+**OpenAI-compatible `/v1/audio/speech`** — clients that already speak the
+OpenAI API only need to swap the base URL:
+
+```bash
+curl -X POST http://127.0.0.1:7788/v1/audio/speech \
+  -H 'content-type: application/json' \
+  -d '{
+        "model": "supertonic-3",
+        "input": "Supertonic is a lightning fast, on-device TTS system.",
+        "voice": "M1",
+        "response_format": "wav"
+      }' \
+  -o output.wav
+```
+
+Multilingual works the same way — set `lang` to any code from
+[Supported Languages](#supported-languages) (or `na` for the fallback).
+
+### Custom voices (Voice Builder JSON)
+
+A voice JSON exported from
+[Voice Builder](https://supertonic.supertone.ai/voice_builder) (or any of the
+bundled `~/.cache/supertonic3/voice_styles/*.json` files) can be uploaded
+once and then referenced by name on every subsequent request.
+
+**Import** — `multipart/form-data` is the simplest path:
+
+```bash
+# Upload my_voice.json; the stem of the filename becomes its name.
+curl -X POST http://127.0.0.1:7788/v1/styles/import \
+  -F "file=@voices/my_voice.json"
+# → {"name":"my_voice","stored_at":"~/.cache/supertonic3/custom_styles/my_voice.json"}
+
+# Override the name explicitly, and allow overwriting an existing entry:
+curl -X POST "http://127.0.0.1:7788/v1/styles/import?overwrite=true" \
+  -F "file=@voices/my_voice.json" \
+  -F "name=demo_voice"
+```
+
+**Synthesize with the imported voice** — just pass its name as `voice`:
+
+```bash
+curl -X POST http://127.0.0.1:7788/v1/tts \
+  -H 'content-type: application/json' \
+  -d '{"text":"Hello in my own cloned voice.","voice":"my_voice","lang":"en"}' \
+  -o output_own_voice.wav
+```
+
+Imported voices are persisted **per model** alongside the bundled voice
+styles — e.g. `~/.cache/supertonic3/custom_styles/<name>.json` for
+`supertonic-3`, `~/.cache/supertonic2/custom_styles/<name>.json` for
+`supertonic-2`. They are re-loaded automatically on the next `supertonic
+serve` start. Names that collide with the built-ins (`M1`–`M5`, `F1`–`F5`)
+are rejected; existing custom names return `409` unless you pass
+`?overwrite=true`. `GET /v1/styles` lists everything currently available
+for the loaded model.
+
+### Batch synthesis
+
+`POST /v1/tts/batch` accepts up to 64 items in a single request and returns
+each result as base64-encoded audio. Per-item `voice` / `lang` / `speed` can
+differ — useful for narration jobs that mix speakers or languages.
+
+```bash
+curl -X POST http://127.0.0.1:7788/v1/tts/batch \
+  -H 'content-type: application/json' \
+  -d '{
+        "items": [
+          {"text": "Supertonic is a lightning fast, on-device TTS system.", "voice": "M1", "lang": "en"},
+          {"text": "회의는 잠시 후에 시작되며 모두가 자리에 앉아 기다립니다.", "voice": "F1", "lang": "ko"},
+          {"text": "La reunión comienza pronto y todos se sientan en silencio para escuchar.", "voice": "F1", "lang": "es"}
+        ],
+        "response_format": "wav",
+        "defaults": {"steps": 8, "speed": 1.05}
+      }'
+```
+
+Response:
+
+```json
+{
+  "items": [
+    {"audio_base64": "...", "duration_s": 4.32, "format": "wav", "sample_rate": 44100},
+    {"audio_base64": "...", "duration_s": 4.88, "format": "wav", "sample_rate": 44100},
+    {"audio_base64": "...", "duration_s": 5.36, "format": "wav", "sample_rate": 44100}
+  ]
+}
+```
+
+Each item carries fully self-contained audio bytes, so writing them out is a
+one-liner:
+
+```bash
+curl -fsS -X POST http://127.0.0.1:7788/v1/tts/batch \
+  -H 'content-type: application/json' \
+  -d '@payload.json' \
+| python3 -c '
+import sys, json, base64, pathlib
+for i, item in enumerate(json.load(sys.stdin)["items"]):
+    pathlib.Path(f"batch_{i}.wav").write_bytes(base64.b64decode(item["audio_base64"]))
+'
+```
+
+Items are processed sequentially (the underlying ONNX session is serialized
+per process), so batching is about cutting HTTP round-trips and packaging
+related work together, not about parallel speed-up. Any per-item failure
+returns a `400` with `items[<index>]` in the error message — no audio is
+emitted partially.
+
 ## Requirements
 
 Supertonic has **minimal dependencies** - just 4 core libraries:
@@ -106,21 +261,21 @@ Supertonic has **minimal dependencies** - just 4 core libraries:
 - **huggingface-hub** - Model downloads
 
 
-## Key Features
+## ✨ Highlights
 
-**⚡ Blazingly Fast**: Generates speech up to **167× faster than real-time** on consumer hardware (M4 Pro)
+**⚡ Blazingly Fast** — Low-latency, real-time synthesis across desktop, browser, mobile, and edge — fast enough to turn an entire webpage into audio in under a second
 
-**🪶 Ultra Lightweight**: Only **66M parameters**, optimized for efficient on-device performance
+**🌍 31-Language Multilingual** — Synthesize directly from text across 31 languages, or pass `lang="na"` to let Supertonic process the text language-agnostically when you don't know the input language — no separate language adapters needed
 
-**📱 On-Device Capable**: **Complete privacy** and **zero latency**
+**🪶 99M-Parameter Open-Weight Model** — A compact, fully open-weight checkpoint — a fraction of the size of 0.7B–2B class open TTS systems — for smaller downloads, faster cold starts, and lower memory footprint
 
-**🌐 Multilingual (v3)**: Supports **31 languages** plus a `na` fallback for unknown languages
+**📱 Edge-Device Ready** — Runs locally on desktop, mobile, browsers, and resource-constrained hardware like Raspberry Pi or e-readers, with zero network dependency, complete privacy, and no GPU required
 
-**🎨 Natural Text Handling**: Seamlessly processes complex expressions without G2P module
+**🔊 44.1kHz High-Quality Audio** — Outputs studio-grade 44.1kHz 16-bit WAV directly, ready for production playback without any external upsampler
 
-**⚙️ Highly Configurable**: Adjust inference steps, batch processing, and other parameters
+**🎭 Expression Tags** — 10 inline tags (e.g. `<laugh>`, `<breath>`, `<sigh>`) bring natural human nuance into generated speech without prompt engineering or reference audio
 
-**🧩 Flexible Deployment**: Deploy across servers, browsers, and edge devices
+**🛠️ Multi-Runtime SDKs** — Ready-to-use examples through ONNX Runtime across Python, Node.js, Browser (WebGPU), Java, C++, C#, Go, Swift, iOS, Rust, and Flutter
 
 ## Supported Languages
 

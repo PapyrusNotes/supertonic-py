@@ -216,6 +216,182 @@ Load custom voice styles from JSON:
     supertonic tts 'Using a custom voice style from JSON file.' --custom-style-path custom_voice.json -o output_custom.wav
     ```
 
+---
+
+## Local Server
+
+`supertonic serve` runs a thin local HTTP wrapper around the same engine —
+useful when embedding a Python interpreter is awkward (n8n community nodes,
+browser extensions, Electron apps, Unity, Home Assistant, robotics devices,
+or anything that already speaks the OpenAI Audio Speech API).
+
+### Install and run
+
+```bash
+pip install 'supertonic[serve]'                    # adds fastapi + uvicorn
+supertonic serve --host 127.0.0.1 --port 7788      # defaults; loopback only
+```
+
+Once it's up:
+
+- Native synthesis endpoint: `http://127.0.0.1:7788/v1/tts`
+- OpenAI-compatible alias: `http://127.0.0.1:7788/v1/audio/speech`
+- Interactive OpenAPI docs: `http://127.0.0.1:7788/docs`
+
+!!! note "Binding beyond loopback"
+    `--host` defaults to `127.0.0.1`. Anything else is opt-in and emits a
+    one-line warning — put the server behind a reverse proxy if you do.
+
+### Generate audio
+
+=== "Native API"
+
+    Full Supertonic parameter set (`steps`, `max_chunk_length`,
+    `silence_duration`, …):
+
+    ```bash
+    curl -X POST http://127.0.0.1:7788/v1/tts \
+      -H 'content-type: application/json' \
+      -d '{
+            "text": "Supertonic is a lightning fast, on-device TTS system.",
+            "voice": "M1",
+            "lang": "en",
+            "steps": 8,
+            "speed": 1.05,
+            "response_format": "wav"
+          }' \
+      -o output.wav
+    ```
+
+    Response is the raw audio bytes (`audio/wav` by default). Useful
+    response headers: `X-Audio-Duration` (seconds), `X-Sample-Rate`, and
+    `X-Supertonic-Version`. Supported `response_format` values: `wav`,
+    `flac`, `ogg` (Vorbis).
+
+=== "OpenAI-compatible"
+
+    Clients that already speak the OpenAI Audio Speech API only need to
+    swap the base URL:
+
+    ```bash
+    curl -X POST http://127.0.0.1:7788/v1/audio/speech \
+      -H 'content-type: application/json' \
+      -d '{
+            "model": "supertonic-3",
+            "input": "Supertonic is a lightning fast, on-device TTS system.",
+            "voice": "M1",
+            "response_format": "wav"
+          }' \
+      -o output.wav
+    ```
+
+    Multilingual input works the same way — just set `lang` to any code from
+    [Multilingual Support](#multilingual-support) (or `na` for the fallback).
+
+### Custom voices (Voice Builder JSON)
+
+A voice JSON exported from
+[Voice Builder](https://supertonic.supertone.ai/voice_builder) (or any of
+the bundled `~/.cache/supertonic3/voice_styles/*.json` files) can be
+uploaded once and referenced by name on every subsequent request.
+
+=== "Import"
+
+    ```bash
+    # multipart upload — the filename stem becomes the voice name
+    curl -X POST http://127.0.0.1:7788/v1/styles/import \
+      -F "file=@voices/my_voice.json"
+    # → {"name":"my_voice","stored_at":"~/.cache/supertonic3/custom_styles/my_voice.json"}
+
+    # override the name; allow overwriting an existing entry
+    curl -X POST "http://127.0.0.1:7788/v1/styles/import?overwrite=true" \
+      -F "file=@voices/my_voice.json" \
+      -F "name=demo_voice"
+
+    # or send a JSON body directly (handy from scripts / n8n)
+    curl -X POST http://127.0.0.1:7788/v1/styles/import \
+      -H 'content-type: application/json' \
+      -d '{"name":"demo_voice","style_ttl":{...},"style_dp":{...}}'
+    ```
+
+=== "Synthesize"
+
+    ```bash
+    curl -X POST http://127.0.0.1:7788/v1/tts \
+      -H 'content-type: application/json' \
+      -d '{"text":"Hello in my own cloned voice.","voice":"my_voice","lang":"en"}' \
+      -o output_own_voice.wav
+    ```
+
+!!! info "Per-model storage"
+    Imported voices are persisted **per model** alongside the bundled voice
+    styles — e.g. `~/.cache/supertonic3/custom_styles/<name>.json` for
+    `supertonic-3`, `~/.cache/supertonic2/custom_styles/<name>.json` for
+    `supertonic-2`. They are re-loaded automatically on the next
+    `supertonic serve` start. Names that collide with the built-ins
+    (`M1`–`M5`, `F1`–`F5`) are rejected; existing custom names return `409`
+    unless you pass `?overwrite=true`. `GET /v1/styles` lists everything
+    available for the loaded model.
+
+### Batch synthesis
+
+`POST /v1/tts/batch` accepts up to 64 items in a single request and returns
+each result as base64-encoded audio. Per-item `voice` / `lang` / `speed` can
+differ — useful for narration jobs that mix speakers or languages.
+
+```bash
+curl -X POST http://127.0.0.1:7788/v1/tts/batch \
+  -H 'content-type: application/json' \
+  -d '{
+        "items": [
+          {"text": "Supertonic is a lightning fast, on-device TTS system.", "voice": "M1", "lang": "en"},
+          {"text": "회의는 잠시 후에 시작되며 모두가 자리에 앉아 기다립니다.", "voice": "F1", "lang": "ko"},
+          {"text": "La reunión comienza pronto y todos se sientan en silencio para escuchar.", "voice": "F1", "lang": "es"}
+        ],
+        "response_format": "wav",
+        "defaults": {"steps": 8, "speed": 1.05}
+      }'
+```
+
+The response is a JSON object with an `items` array:
+
+```json
+{
+  "items": [
+    {"audio_base64": "...", "duration_s": 4.32, "format": "wav", "sample_rate": 44100},
+    {"audio_base64": "...", "duration_s": 4.88, "format": "wav", "sample_rate": 44100},
+    {"audio_base64": "...", "duration_s": 5.36, "format": "wav", "sample_rate": 44100}
+  ]
+}
+```
+
+Each item carries fully self-contained audio bytes, so writing them out is
+a one-liner:
+
+```bash
+curl -fsS -X POST http://127.0.0.1:7788/v1/tts/batch \
+  -H 'content-type: application/json' \
+  -d '@payload.json' \
+| python3 -c '
+import sys, json, base64, pathlib
+for i, item in enumerate(json.load(sys.stdin)["items"]):
+    pathlib.Path(f"batch_{i}.wav").write_bytes(base64.b64decode(item["audio_base64"]))
+'
+```
+
+!!! note "Sequential, not parallel"
+    Items are processed sequentially within a process (the ONNX session is
+    serialized) — so batching saves HTTP round-trips and packages related
+    work together, not raw inference time. Any per-item failure returns a
+    `400` with `items[<index>]` in the error message; no audio is emitted
+    partially.
+
+See also: **[supertonic serve](cli/serve.md)** for full CLI flags and
+**[supertonic.server](api/server.md)** for embedding the FastAPI app in a
+larger ASGI service.
+
+---
+
 ### Speech Speed Control
 
 Adjust speech rate from 0.7× (slow) to 2.0× (fast):

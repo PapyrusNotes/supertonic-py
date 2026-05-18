@@ -23,6 +23,9 @@ supertonic tts TEXT -o OUTPUT.wav [OPTIONS]
 supertonic list-voices       # List available voices
 supertonic info             # Show model information
 supertonic version          # Show version
+
+# Local HTTP server (requires the [serve] extra)
+supertonic serve [--host HOST] [--port PORT] [--model NAME] [--cors ORIGINS]
 ```
 
 The `supertonic` command-line tool provides easy access to text-to-speech synthesis. You can start by viewing the help message with:
@@ -34,7 +37,7 @@ supertonic --help
 Available Commands:
 
 ```bash
-supertonic {say,tts,list-voices,info,download,version}
+supertonic {say,tts,list-voices,info,download,version,serve}
 ```
 
 ## say
@@ -131,6 +134,23 @@ supertonic version
 ```
 
 **Aliases:** `v`
+
+## serve
+
+Run a thin local HTTP server with a native `/v1/*` namespace and an
+OpenAI-compatible alias.
+
+!!! note "Requires `fastapi` + `uvicorn`"
+    Install with: `pip install 'supertonic[serve]'`
+
+```bash
+supertonic serve --host 127.0.0.1 --port 7788
+```
+
+Once running, hit it with any HTTP client — e.g. n8n, browser extensions,
+or the OpenAI SDK pointed at `http://127.0.0.1:7788/v1`. See
+[supertonic serve](./serve.md) for the full reference of arguments and
+endpoints.
 
 ---
 

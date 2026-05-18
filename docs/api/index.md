@@ -27,3 +27,4 @@ wav, duration = tts.synthesize(
 - **[utils](utils.md)** - Helper functions for text processing and audio utilities
 - **[config](config.md)** - Configuration constants and default values
 - **[cli](cli.md)** - Command-line interface implementation
+- **[server](server.md)** - Optional FastAPI HTTP server (`pip install supertonic[serve]`)
