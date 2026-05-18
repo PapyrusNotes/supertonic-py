@@ -50,11 +50,15 @@ classifiers = [
 ]
 
 dependencies = [
-    # onnxruntime 1.20.0 is the first release with a Python 3.13 wheel — anything
-    # lower forces source builds on 3.13 environments. (1.19.0 was the floor we
-    # raised to in 1.2.3 for numpy 2.x C-ABI compatibility; this bump keeps that
-    # invariant and adds 3.13 wheel availability.)
-    "onnxruntime>=1.20.0",
+    # onnxruntime's Python-version coverage shifted in 1.20.0: 1.20.0 is the
+    # first release with a Python 3.13 wheel, but it also *dropped* the
+    # Python 3.9 wheel. We therefore floor by Python version:
+    #   - 3.9-3.12 : 1.19.0+ (3.9 wheel still available; numpy 2.x C-ABI safe)
+    #   - 3.13+   : 1.20.0+ (3.13 wheel; 3.9 already excluded by this marker)
+    # `pip` combines both constraints and picks the highest version that
+    # satisfies the active Python.
+    "onnxruntime>=1.19.0; python_version < '3.13'",
+    "onnxruntime>=1.20.0; python_version >= '3.13'",
     "numpy>=1.21.0",
     "soundfile>=0.10.0",
     "huggingface-hub>=0.10.0",
@@ -73,8 +77,12 @@ serve = [
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.1.0",
-    "black>=23.0",
-    "ruff>=0.1.0",
+    # Pin floors at the minor series we actually format/lint against. Lower
+    # bounds bump because black/ruff change formatting rules between minor
+    # releases — when CI installs a different floor than the lint job's
+    # contributor environment, "would reformat" diffs flap on every PR.
+    "black>=25.0",
+    "ruff>=0.5",
     "build>=1.0.0",
     "twine>=4.0.0",
     "httpx>=0.27",
