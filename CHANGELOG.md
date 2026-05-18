@@ -49,6 +49,18 @@ shipping under a patch bump on purpose.**
   in the server package. Resolution is **lazy** (call-time) instead of
   eager (import-time), so late-set env vars are honored. Tests cover the
   reproduction from the original bug report plus a lazy-evaluation guard.
+- **Restore Python 3.9 installability after the `onnxruntime>=1.20.0`
+  bump.** onnxruntime 1.20.0 added a 3.13 wheel but dropped the 3.9 wheel,
+  so a single floor couldn't satisfy both ends of the supported range.
+  The dependency is now split with PEP 508 markers:
+  `onnxruntime>=1.19.0; python_version<'3.13'` and
+  `onnxruntime>=1.20.0; python_version>='3.13'`. 3.9-3.12 keep the 1.19.0
+  floor (3.9 wheel available, numpy 2.x C-ABI safe); 3.13 gets the 1.20.0
+  floor (3.13 wheel available).
+- **CI lint job now installs through the `[dev]` extra** instead of a
+  bare `pip install black ruff`, so contributor and CI formatting/linting
+  versions cannot drift. The `[dev]` floors are raised to `black>=25.0`
+  and `ruff>=0.5` accordingly.
 
 ## [1.3.0] — 2026-05-18
 
