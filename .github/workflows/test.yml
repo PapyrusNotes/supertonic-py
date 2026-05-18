@@ -2,7 +2,10 @@ name: Tests
 
 on:
   push:
-    branches: [main, develop]
+    # Run on main/develop and on any release branch so release/vX.Y.Z pushes
+    # get the same gate as PRs (previously, pushing to a release branch
+    # without an open PR meant CI silently never ran).
+    branches: [main, develop, 'release/**']
   pull_request:
     branches: [main, develop]
 
@@ -68,8 +71,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
+      - name: Show lint tool versions
+        # Surfaces the resolved black/ruff versions in the job log so any
+        # future drift is easy to spot at a glance.
+        run: |
+          python -m black --version
+          python -m ruff --version
+
       - name: Check formatting with Black
-        run: black --check supertonic tests
+        # `python -m black` (not bare `black`) so we definitely use the one
+        # pip just installed into this venv. `--diff` makes the job log
+        # show exactly which lines need reformatting if it ever fails.
+        run: python -m black --check --diff supertonic tests
 
       - name: Lint with Ruff
-        run: ruff check supertonic tests
+        run: python -m ruff check supertonic tests

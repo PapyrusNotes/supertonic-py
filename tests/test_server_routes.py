@@ -23,7 +23,6 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from supertonic.server import ServerState, create_app  # noqa: E402
 
-
 SAMPLE_RATE = 44100
 
 
