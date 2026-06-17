@@ -263,8 +263,8 @@ def cmd_serve(args):
 
     app = create_app(model=args.model, cors_origins=cors_origins)
 
-    print(f"supertonic serve listening on http://{args.host}:{args.port}")
-    print(f"  docs:  http://{args.host}:{args.port}/docs")
+    print(f"supertonic serve listening on http://{args.host}:{args.port}/{args.root_path}")
+    print(f"  docs:  http://{args.host}:{args.port}/{args.root_path}/docs")
     print(f"  model: {args.model}")
 
     uvicorn.run(
@@ -272,6 +272,7 @@ def cmd_serve(args):
         host=args.host,
         port=args.port,
         log_level=args.log_level,
+        root_path=args.root_path,
         # uvicorn's reload mode requires an import string, not an app instance.
         # We don't support it here — power users can run uvicorn directly
         # against ``supertonic.server:create_app`` if they want reload.
@@ -500,7 +501,14 @@ Examples:
         help="Interface to bind (default: 127.0.0.1; loopback only)",
     )
     parser_serve.add_argument(
-        "--port", type=int, default=7788, help="Port to listen on (default: 7788)"
+        "--port", type=int, default=7788, help="Port to listen on (default: 7788)",
+    )
+    # ADD : --root-path arg
+    parser_serve.add_argument(
+        "--root-path", 
+        type=str, 
+        default=None, 
+        help='URL subpath prefix behind Proxy (default: "")',
     )
     parser_serve.add_argument(
         "--model",

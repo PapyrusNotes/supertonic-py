@@ -93,6 +93,7 @@ def test_cmd_serve_non_loopback_warns(monkeypatch, capsys):
     def fake_uvicorn_run(app, **kwargs):
         called["host"] = kwargs.get("host")
         called["port"] = kwargs.get("port")
+        called["root_path"] = kwargs.get("root_path")
         # Don't actually start a server.
 
     def fake_create_app(**kwargs):
@@ -106,6 +107,7 @@ def test_cmd_serve_non_loopback_warns(monkeypatch, capsys):
         verbose=False,
         host="0.0.0.0",
         port=7788,
+        root_path='supertonic',
         model="supertonic-3",
         cors=None,
         log_level="info",
@@ -115,4 +117,35 @@ def test_cmd_serve_non_loopback_warns(monkeypatch, capsys):
     assert "Warning" in err and "0.0.0.0" in err
     assert called["host"] == "0.0.0.0"
     assert called["port"] == 7788
+    assert called["root_path"] == 'supertonic'
     assert called["model"] == "supertonic-3"
+
+# root_url 
+def test_parser_root_path():
+    parser = create_parser()
+    args = parser.parse_args(
+        [
+            "serve",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "9000",
+            "--root-path",
+            "supertonic",
+            "--model",
+            "supertonic-2",
+            "--cors",
+            "http://localhost:*,chrome-extension://*",
+            "--log-level",
+            "debug",
+            "--verbose",
+        ]
+    )
+
+    assert args.host == "0.0.0.0"
+    assert args.port == 9000
+    assert args.root_path == "supertonic"
+    assert args.model == "supertonic-2"
+    assert args.cors == "http://localhost:*,chrome-extension://*"
+    assert args.log_level == "debug"
+    assert args.verbose is True
