@@ -261,10 +261,14 @@ def cmd_serve(args):
     if args.cors:
         cors_origins = [o.strip() for o in args.cors.split(",") if o.strip()]
 
-    app = create_app(model=args.model, cors_origins=cors_origins)
 
-    print(f"supertonic serve listening on http://{args.host}:{args.port}/{args.root_path}")
-    print(f"  docs:  http://{args.host}:{args.port}/{args.root_path}/docs")
+    app = create_app(model=args.model, cors_origins=cors_origins, root_path=args.root_path)
+
+    # root path args check
+    print(f"root_path args : {args.root_path}")
+
+    print(f"supertonic serve listening on http://{args.host}:{args.port}")
+    print(f"  docs:  http://{args.host}:{args.port}/docs")
     print(f"  model: {args.model}")
 
     uvicorn.run(
@@ -272,7 +276,6 @@ def cmd_serve(args):
         host=args.host,
         port=args.port,
         log_level=args.log_level,
-        root_path=args.root_path,
         # uvicorn's reload mode requires an import string, not an app instance.
         # We don't support it here — power users can run uvicorn directly
         # against ``supertonic.server:create_app`` if they want reload.

@@ -151,6 +151,7 @@ def create_app(
     model: str = DEFAULT_MODEL,
     custom_styles_dir: Optional[Path] = None,
     cors_origins: Optional[Iterable[str]] = None,
+    root_path:str
 ) -> FastAPI:
     """Build a configured FastAPI app.
 
@@ -203,6 +204,7 @@ def create_app(
         ),
         version=__version__,
         lifespan=lifespan,
+        root_path=root_path,
     )
     app.state.server_state = state
 
