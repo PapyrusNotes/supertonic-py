@@ -418,4 +418,9 @@ def register_routes(app: FastAPI) -> None:
             )
         return BatchResponse(items=results)
 
+    # New : Make a client download generated file as called.
+    @router.post("/v1/tts/download")
+    def download_synth_native(req:TTSRequest, request: Request):
+        pass
+
     app.include_router(router)
