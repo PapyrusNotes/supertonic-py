@@ -243,10 +243,11 @@ def cmd_serve(args):
         import uvicorn
 
         from .server import create_app
-    except ImportError:
+    except ImportError as e:
         print("❌ Error: fastapi and uvicorn are required for the 'serve' command.")
         print("   Install them with: pip install supertonic[serve]")
-        sys.exit(1)
+        raise e
+        # sys.exit(1)
 
     if args.host not in ("127.0.0.1", "localhost", "::1"):
         # Bind to anything other than loopback is opt-in. Print a one-line
