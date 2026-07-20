@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import base64
 import json
+import uuid
 import logging
 from pathlib import Path
 from typing import Any, Optional, TYPE_CHECKING
@@ -27,6 +28,7 @@ import numpy as np
 from fastapi import APIRouter, FastAPI, File, Form, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
 
+from .config import setting
 from .. import __version__
 from ..config import AVAILABLE_LANGUAGES
 from . import styles_store
@@ -146,6 +148,30 @@ def _audio_response(state: "ServerState", wav: np.ndarray, fmt: str, duration_s:
             "X-Sample-Rate": str(state.tts.sample_rate),
         },
     )
+
+
+def _sink_audio_to_local(state:"ServerState", wav:np.ndarray, fmt:str) -> str:
+    audio_bytes = encode_audio(wav, state.tts.sample_rate, fmt)
+    audio_filename = f"{uuid.uuid4().hex}.{fmt}"
+
+    SINK_PATH = setting.SINK_DIR / audio_filename
+
+    with open(SINK_PATH, "wb") as f:
+        f.write(audio_bytes)
+
+    return audio_filename
+    
+
+def _audio_sink_response(state: "ServerState", sunk_filename: str,  duration_s: float) -> JSONResponse:
+    return JSONResponse(
+        content={"filename": sunk_filename},
+        headers={
+            "X-Audio-Duration": f"{duration_s:.3f}",
+            "X-Supertonic-Version": __version__,
+            "X-Sample-Rate": str(state.tts.sample_rate),
+        }
+    )
+
 
 
 def _validate_lang(lang: Optional[str]):
@@ -418,9 +444,49 @@ def register_routes(app: FastAPI) -> None:
             )
         return BatchResponse(items=results)
 
-    # New : Make a client download generated file as called.
-    @router.post("/v1/tts/download")
-    def download_synth_native(req:TTSRequest, request: Request):
-        pass
+    # File sink feature
+    # 1. Sink generated audio file into its machine.
+    # 2. Return generated file info.
+    # TODO : Add response_model
+    @router.post("/v1/tts/sink")
+    def sink_synth_native(req:TTSRequest, request: Request):
+
+        state = _state(request)
+        if state.tts is None:
+            return _error(503, "server not ready", "not_ready", type_="server_error")
+        
+        try:
+            fmt = coerce_response_format(req.response_format)
+        except UnsupportedAudioFormat as e:
+            return _error(
+                400,
+                f"unsupported response_format {str(e)!r}",
+                "unsupported_response_format",
+            )
+        
+        err = _validate_lang(req.lang)
+        if err is not None:
+            return err
+        
+        try:
+            wav, dur = _do_synthesize(
+                state,
+                text=req.text,
+                voice=req.voice,
+                lang=req.lang,
+                speed=req.speed,
+                steps=req.steps,
+                max_chunk_length=req.max_chunk_length,
+                silence_duration=req.silence_duration,
+            )
+        except UnknownVoice as e:
+            return _error(400, f"unknown voice {str(e)!r}", "unknown_voice")
+        
+        except Exception as e:  # noqa: BLE001 — surface as 500 with code
+            logger.exception("synthesis failed")
+            return _error(500, f"synthesis failed: {e}", "synthesis_failed", type_="server_error")
+        
+        sunk_filename = _sink_audio_to_local(state, wav, fmt)
+        return _audio_sink_response(state, sunk_filename, dur)
 
     app.include_router(router)
