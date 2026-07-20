@@ -7,7 +7,7 @@ name = "supertonic"
 version = "1.3.1"
 description = "High-quality Text-to-Speech synthesis with ONNX Runtime"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "MIT"
 authors = [
     {name = "Yu, Yechan", email = "ato@supertone.ai"},
@@ -38,7 +38,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -62,6 +61,7 @@ dependencies = [
     "numpy>=1.21.0",
     "soundfile>=0.10.0",
     "huggingface-hub>=0.10.0",
+    "pydantic-settings (>=2.14.2,<3.0.0)",
 ]
 
 [project.optional-dependencies]
@@ -72,6 +72,7 @@ serve = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.27",
     "pydantic>=2.5",
+    "pydantic-settings>=2.0.0",
     "python-multipart>=0.0.9",
 ]
 dev = [
