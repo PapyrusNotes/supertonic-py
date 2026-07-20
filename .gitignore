@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Output .wav files
+output/*
+*.wav
+
 # C extensions
 *.so
 
