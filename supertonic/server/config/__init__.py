@@ -7,16 +7,19 @@ from pydantic_settings import BaseSettings
 SUPERTONIC_SERVER_ROOT = Path(__file__).resolve().parent.parent
 
 class Settings(BaseSettings):
-  # supertonic[serve] setting
-  SINK_DIR:Path = SUPERTONIC_SERVER_ROOT / 'output'
-
+  SINK_DIR:Path
+  
 
 class DevSettings(Settings):
+  SINK_DIR:Path = SUPERTONIC_SERVER_ROOT / 'output'
+
   class Config:
     env_file = 'supertonic/server/config/dev.env'
 
 
 class BetaSettings(Settings):
+  SINK_DIR: Path = Path('/app/output')
+
   class Config:
     env_file = 'supertonic/server/config/beta.env'
 
